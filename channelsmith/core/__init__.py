@@ -16,9 +16,11 @@ from channelsmith.core.channel_map import (
     ALPHA,
     PREDEFINED_CHANNELS,
 )
+from channelsmith.core.packing_template import PackingTemplate
 
 __all__ = [
     'ChannelMap',
+    'PackingTemplate',
     'AMBIENT_OCCLUSION',
     'ROUGHNESS',
     'METALLIC',
