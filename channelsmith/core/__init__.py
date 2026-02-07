@@ -26,6 +26,12 @@ from channelsmith.core.validator import (
     ResolutionMismatchError,
     InvalidChannelDataError,
 )
+from channelsmith.core.packing_engine import (
+    normalize_resolution,
+    pack_channels,
+    pack_texture_from_template,
+    create_default_channel,
+)
 
 __all__ = [
     'ChannelMap',
@@ -45,4 +51,8 @@ __all__ = [
     'validate_arrays_for_packing',
     'ResolutionMismatchError',
     'InvalidChannelDataError',
+    'normalize_resolution',
+    'pack_channels',
+    'pack_texture_from_template',
+    'create_default_channel',
 ]
