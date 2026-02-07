@@ -1,0 +1,18 @@
+{
+  "name": "ORD",
+  "description": "Occlusion-Roughness-Displacement",
+  "channels": {
+    "R": {
+      "type": "ambient_occlusion",
+      "default": 1.0
+    },
+    "G": {
+      "type": "roughness",
+      "default": 0.5
+    },
+    "B": {
+      "type": "displacement",
+      "default": 0.5
+    }
+  }
+}

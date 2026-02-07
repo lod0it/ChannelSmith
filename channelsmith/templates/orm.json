@@ -1,0 +1,18 @@
+{
+  "name": "ORM",
+  "description": "Occlusion-Roughness-Metallic (Standard PBR)",
+  "channels": {
+    "R": {
+      "type": "ambient_occlusion",
+      "default": 1.0
+    },
+    "G": {
+      "type": "roughness",
+      "default": 0.5
+    },
+    "B": {
+      "type": "metallic",
+      "default": 0.0
+    }
+  }
+}
