@@ -56,9 +56,43 @@ ChannelSmith is a desktop application that allows game developers and technical 
    pip install -r requirements.txt
    ```
 
-### Usage (Alpha - Programmatic API)
+### Usage (GUI - Beta Phase)
 
-Currently in Alpha phase with no GUI. Use the Python API:
+ChannelSmith now includes a full tkinter GUI! Launch the application:
+
+```bash
+python -m channelsmith
+```
+
+#### Basic Workflow
+
+**Pack Textures:**
+1. Launch ChannelSmith
+2. Go to the **Pack** tab
+3. Select your template (ORM, ORD, or custom)
+4. Load grayscale maps (Ambient Occlusion, Roughness, Metallic, etc.)
+5. Click **Pack** to combine into single RGBA texture
+6. Save the result
+
+**Unpack Textures:**
+1. Go to the **Unpack** tab
+2. Load a packed texture
+3. Select the correct template
+4. Click **Unpack** to extract individual channels
+5. Save each channel as separate files
+
+**Features:**
+- 🖱️ Drag-and-drop image loading
+- 👁️ Live preview of results
+- 📁 Project save/load (.csproj format)
+- ⚙️ Custom template support
+- ↔️ Repack between template formats (ORM → ORD)
+
+See [USER_GUIDE.md](docs/USER_GUIDE.md) for detailed instructions.
+
+### Programmatic API (Python)
+
+For automation or scripting:
 
 ```python
 from channelsmith.core.packing_engine import pack_texture_from_template
@@ -75,26 +109,28 @@ metallic_map = load_image("textures/metallic.png")
 
 # Pack into single texture
 textures = {
-    'R': ao_map,
-    'G': roughness_map,
-    'B': metallic_map
+    'ambient_occlusion': ao_map,
+    'roughness': roughness_map,
+    'metallic': metallic_map
 }
 
 packed = pack_texture_from_template(textures, template)
 
 # Save result
-save_image(packed, "output/material_orm.png", "PNG")
+save_image(packed, "output/material_orm.png")
 ```
-
-**GUI coming in Beta phase!**
 
 ---
 
 ## 📚 Documentation
 
-- **[SETUP.md](SETUP.md)** - Development environment setup
+### User Documentation
+- **[USER_GUIDE.md](docs/USER_GUIDE.md)** - Complete user guide with workflows and FAQs
+- **[SETUP.md](SETUP.md)** - Installation and environment setup
+
+### Developer Documentation
 - **[CLAUDE.md](CLAUDE.md)** - Architecture and development guidelines
-- **[ALPHA_TASKS.md](ALPHA_TASKS.md)** - Alpha phase implementation roadmap
+- **[BETA_TASKS.md](BETA_TASKS.md)** - Beta phase implementation roadmap
 - **[docs/MVP_Documentation.md](docs/MVP_Documentation.md)** - Complete MVP specification
 
 ---
@@ -118,20 +154,24 @@ ChannelSmith/
 
 ## 🛠️ Development Status
 
-### Current Phase: Alpha
+### Current Phase: Beta
 
-**Goal:** Core packing/unpacking engine functional and tested (no GUI)
+**Goal:** Complete GUI implementation with all core features and workflows
 
 **Progress:**
-- [ ] ChannelMap class
-- [ ] PackingTemplate class
-- [ ] Template JSON loader
-- [ ] Packing engine
-- [ ] Unpacking engine
-- [ ] Validation layer
-- [ ] Comprehensive tests
+- ✅ Core packing/unpacking engine (Alpha - Complete)
+- ✅ Template system with ORM/ORD templates
+- ✅ Main GUI window and tabs
+- ✅ Pack panel with image selection and preview
+- ✅ Unpack panel with channel extraction
+- ✅ Drag-and-drop support
+- ✅ Progress indicators
+- ✅ File manager (save/load projects)
+- ✅ Application lifecycle management
+- 🔄 Integration tests (in progress)
+- 🔄 User documentation (in progress)
 
-See [ALPHA_TASKS.md](ALPHA_TASKS.md) for detailed checklist.
+See [BETA_TASKS.md](BETA_TASKS.md) for detailed checklist.
 
 ### Roadmap
 
@@ -205,6 +245,6 @@ For inquiries about ChannelSmith, please contact [your email/contact info].
 
 ---
 
-**Status:** In Development  
-**Version:** 0.1.0-alpha  
-**Last Updated:** February 7, 2026
+**Status:** In Beta Development
+**Version:** 0.1.0-beta
+**Last Updated:** February 8, 2026
