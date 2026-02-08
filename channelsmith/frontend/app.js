@@ -214,6 +214,9 @@ function handleFileSelected(channel, file, zoneElement) {
     if (previewCanvas) {
         displayImagePreview(file, previewCanvas);
     }
+
+    // Update pack button ready state if at least one channel is selected
+    updatePackButtonState();
 }
 
 function displayImagePreview(file, canvas) {
@@ -280,6 +283,25 @@ function clearChannelUpload(channel) {
             ctx.fillStyle = '#1a1a1a';
             ctx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
         }
+    }
+
+    // Update pack button ready state
+    updatePackButtonState();
+}
+
+function updatePackButtonState() {
+    const packButton = document.getElementById('pack-button');
+    const hasChannels = Object.values(state.packChannels).some(ch => ch !== null);
+
+    if (hasChannels) {
+        if (!packButton.classList.contains('ready')) {
+            packButton.classList.add('ready', 'vibrate');
+            setTimeout(() => {
+                packButton.classList.remove('vibrate');
+            }, 600);
+        }
+    } else {
+        packButton.classList.remove('ready');
     }
 }
 

@@ -58,17 +58,24 @@ body {
 /* Upload Zones */
 .upload-zone {
     @apply relative border-2 border-dashed border-gray-700 rounded-lg p-8
-           text-center cursor-pointer transition-all duration-200
-           hover:border-teal-500 hover:bg-gray-800 hover:bg-opacity-50;
+           text-center cursor-pointer transition-all duration-300
+           hover:border-teal-500 hover:bg-gray-800 hover:bg-opacity-50 hover:shadow-md;
     min-height: 120px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transform: translateZ(0);
+}
+
+.upload-zone:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 115, 119, 0.2);
 }
 
 .upload-zone.dragover {
     @apply border-teal-400 bg-gray-800 bg-opacity-70;
-    box-shadow: 0 0 16px rgba(13, 115, 119, 0.4);
+    box-shadow: 0 0 20px rgba(13, 115, 119, 0.5);
+    transform: translateY(-4px) scale(1.02);
 }
 
 .upload-zone input[type="file"] {
@@ -91,15 +98,38 @@ body {
 
 /* Button Styles */
 .btn-primary {
-    @apply relative bg-gradient-to-br from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600
-           text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200
-           shadow-lg hover:shadow-xl hover:shadow-teal-500/20
-           focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-gray-900
+    @apply relative w-full py-4 px-6 font-bold text-lg rounded-xl
+           transition-all duration-300 ease-out
+           shadow-lg hover:shadow-xl
+           focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-offset-gray-900
            disabled:opacity-50 disabled:cursor-not-allowed;
+    background: linear-gradient(135deg, #0d7377 0%, #14919b 100%);
+    color: white;
+    border: 2px solid transparent;
 }
 
-.btn-primary:active {
-    transform: scale(0.98);
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(13, 115, 119, 0.4);
+}
+
+.btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-primary.ready {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+}
+
+.btn-primary.ready:hover:not(:disabled) {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(16, 185, 129, 0.5);
+}
+
+.btn-primary.ready.vibrate {
+    animation: vibrate 0.6s ease-in-out;
 }
 
 .btn-secondary {
@@ -112,41 +142,6 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Unpack Button Styling */
-#unpack-button {
-    @apply w-full py-4 px-6 font-bold text-lg rounded-xl
-           transition-all duration-300 ease-out
-           shadow-lg hover:shadow-xl
-           focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-offset-gray-900;
-    background: linear-gradient(135deg, #0d7377 0%, #14919b 100%);
-    color: white;
-    border: 2px solid transparent;
-}
-
-#unpack-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(13, 115, 119, 0.4);
-}
-
-#unpack-button:active {
-    transform: translateY(0);
-}
-
-/* Ready state (green) - shown when image is uploaded */
-#unpack-button.ready {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
-}
-
-#unpack-button.ready:hover {
-    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
-    transform: translateY(-3px);
-    box-shadow: 0 12px 24px rgba(16, 185, 129, 0.5);
-}
-
-#unpack-button.ready.vibrate {
-    animation: vibrate 0.6s ease-in-out;
-}
 
 /* Preview Cards */
 .preview-card {
