@@ -56,39 +56,61 @@ ChannelSmith is a desktop application that allows game developers and technical 
    pip install -r requirements.txt
    ```
 
-### Usage (GUI - Beta Phase)
+### Usage - Web UI (Recommended) 🌐
 
-ChannelSmith now includes a full tkinter GUI! Launch the application:
+ChannelSmith features a modern **web-based interface** with Flask backend and Tailwind CSS styling!
 
 ```bash
 python -m channelsmith
 ```
 
-#### Basic Workflow
+The browser opens automatically at **http://localhost:5000**
+
+#### Web UI Features
+
+- 🎨 **Modern Dark Theme** - Professional Tailwind CSS design
+- 🖱️ **Drag-and-Drop** - Upload images by dragging to zones
+- 👁️ **Live Preview** - See channels in real-time as you upload
+- 📥 **Download Results** - Get packed or unpacked images instantly
+- ⚡ **Responsive Design** - Works on desktop, tablet, mobile
+- 🚀 **No External Tools** - Everything in your browser
+
+#### Web UI Workflow
 
 **Pack Textures:**
-1. Launch ChannelSmith
-2. Go to the **Pack** tab
-3. Select your template (ORM, ORD, or custom)
-4. Load grayscale maps (Ambient Occlusion, Roughness, Metallic, etc.)
-5. Click **Pack** to combine into single RGBA texture
-6. Save the result
+1. Open http://localhost:5000 (auto-opens in browser)
+2. Stay on **"Pack Channels"** tab
+3. Select template (**ORM**, **ORD**, etc.)
+4. Drag or click to upload Red, Green, Blue channels
+5. (Alpha channel optional)
+6. Click **"Pack Texture"**
+7. Download packed PNG immediately
 
 **Unpack Textures:**
-1. Go to the **Unpack** tab
-2. Load a packed texture
-3. Select the correct template
-4. Click **Unpack** to extract individual channels
-5. Save each channel as separate files
+1. Switch to **"Unpack Texture"** tab
+2. Upload your packed texture
+3. Select correct template
+4. Click **"Unpack Texture"**
+5. Download extracted channels as individual PNG files
 
-**Features:**
-- 🖱️ Drag-and-drop image loading
-- 👁️ Live preview of results
-- 📁 Project save/load (.csproj format)
-- ⚙️ Custom template support
-- ↔️ Repack between template formats (ORM → ORD)
+#### Legacy GUI (Deprecated but Functional)
+
+If you prefer the classic tkinter interface:
+
+```bash
+python -m channelsmith --gui
+```
 
 See [USER_GUIDE.md](docs/USER_GUIDE.md) for detailed instructions.
+
+#### Complete Testing Guide
+
+See **[WEB_UI_TESTING.md](WEB_UI_TESTING.md)** for:
+- Automated API tests (22 tests, all passing)
+- Manual testing workflows
+- Edge case testing
+- Browser compatibility
+- Performance benchmarks
 
 ### Programmatic API (Python)
 
@@ -126,12 +148,13 @@ save_image(packed, "output/material_orm.png")
 
 ### User Documentation
 - **[USER_GUIDE.md](docs/USER_GUIDE.md)** - Complete user guide with workflows and FAQs
+- **[WEB_UI_TESTING.md](WEB_UI_TESTING.md)** - Web UI testing guide & workflows
 - **[SETUP.md](SETUP.md)** - Installation and environment setup
 
 ### Developer Documentation
 - **[CLAUDE.md](CLAUDE.md)** - Architecture and development guidelines
-- **[BETA_TASKS.md](BETA_TASKS.md)** - Beta phase implementation roadmap
-- **[docs/MVP_Documentation.md](docs/MVP_Documentation.md)** - Complete MVP specification
+- **[channelsmith/README.md](channelsmith/README.md)** - Package structure
+- **[docs/USER_GUIDE.md](docs/USER_GUIDE.md)** - Complete user guide
 
 ---
 
@@ -139,46 +162,65 @@ save_image(packed, "output/material_orm.png")
 
 ```
 ChannelSmith/
-├── channelsmith/           # Main package
-│   ├── core/              # Packing/unpacking engine
-│   ├── gui/               # GUI layer (Beta+)
-│   ├── templates/         # Template JSON files and loader
-│   └── utils/             # Utilities
-├── tests/                 # Test suite
-├── docs/                  # Documentation
-├── examples/              # Usage examples
-└── requirements.txt       # Python dependencies
+├── channelsmith/               # Main package
+│   ├── core/                  # Packing/unpacking engine
+│   ├── api/                   # Flask REST API (NEW)
+│   │   ├── app.py            # Flask app factory
+│   │   ├── routes.py         # API endpoints (pack, unpack, templates)
+│   │   └── utils.py          # Image utilities & validation
+│   ├── frontend/              # Web UI (NEW)
+│   │   ├── index.html        # Single-page app
+│   │   ├── styles.css        # Tailwind CSS styling
+│   │   └── app.js            # Vanilla JavaScript logic
+│   ├── gui/                   # GUI layer (Legacy, still functional)
+│   ├── templates/             # Template JSON files & loader
+│   └── utils/                 # Utilities
+├── tests/
+│   ├── test_api/             # API endpoint tests (NEW)
+│   ├── test_core/            # Core engine tests
+│   ├── test_gui/             # GUI tests
+│   └── ...
+├── docs/                      # Documentation
+├── WEB_UI_TESTING.md          # Web UI testing guide (NEW)
+├── CLAUDE.md                  # Development guidelines
+├── SETUP.md                   # Installation guide
+├── requirements.txt           # Python dependencies
+└── README.md                  # This file
 ```
 
 ---
 
 ## 🛠️ Development Status
 
-### Current Phase: Beta
+### Current Phase: Post-Beta with Web MVP ✨
 
-**Goal:** Complete GUI implementation with all core features and workflows
+**Goal:** Deliver production-ready web UI with full pack/unpack workflows
 
 **Progress:**
 - ✅ Core packing/unpacking engine (Alpha - Complete)
 - ✅ Template system with ORM/ORD templates
-- ✅ Main GUI window and tabs
-- ✅ Pack panel with image selection and preview
-- ✅ Unpack panel with channel extraction
+- ✅ **Web UI MVP** - Flask REST API + Tailwind CSS frontend (NEW)
+- ✅ Full pack/unpack workflows
 - ✅ Drag-and-drop support
-- ✅ Progress indicators
-- ✅ File manager (save/load projects)
-- ✅ Application lifecycle management
-- 🔄 Integration tests (in progress)
-- 🔄 User documentation (in progress)
+- ✅ Live preview with Base64 encoding
+- ✅ Browser auto-launch
+- ✅ API tests (22 comprehensive tests, all passing)
+- ✅ Core tests (207 tests, all passing, no regressions)
+- ✅ Legacy tkinter GUI still functional
+- 🔄 Advanced features (batch processing, custom templates UI)
 
-See [BETA_TASKS.md](BETA_TASKS.md) for detailed checklist.
+**Test Coverage:**
+- Core Engine: 207 tests ✓
+- REST API: 22 tests ✓
+- Total: 229 tests passing
 
 ### Roadmap
 
-- **Alpha (Current):** Core engine - 2-3 weeks
-- **Beta:** Simple GUI with drag-and-drop - 2-3 weeks
-- **RC:** Bug fixes, installer, documentation - 1-2 weeks
-- **v1.0:** Public release
+- **Alpha:** Core engine ✅
+- **Beta:** Tkinter GUI ✅
+- **Web MVP:** Flask + Tailwind web UI ✅
+- **RC:** Bug fixes, performance optimization, advanced features
+- **v1.0:** Production release
 
 ---
 
@@ -216,10 +258,23 @@ This is currently a private project. Contribution guidelines will be added upon 
 
 1. Activate virtual environment: `source venv/bin/activate`
 2. Create feature: Work on `dev` branch
-3. Write tests first (TDD approach)
+3. **Write tests first** (TDD approach)
+   - Core logic: `tests/test_core/`
+   - API endpoints: `tests/test_api/`
+   - GUI: `tests/test_gui/`
 4. Format code: `black channelsmith/`
-5. Run tests: `pytest`
-6. Commit: `git commit -m "feat(core): description"`
+5. Run tests: `pytest tests/` (expect 229+ passing)
+6. Run API tests specifically: `pytest tests/test_api/ -v`
+7. Commit: `git commit -m "feat(scope): description"`
+
+### Testing the Web UI
+
+See **[WEB_UI_TESTING.md](WEB_UI_TESTING.md)** for complete guide including:
+- Quick start (2 minutes)
+- Automated API tests
+- Manual testing workflows
+- Edge case testing
+- Browser compatibility
 
 ### Code Standards
 
@@ -245,6 +300,6 @@ For inquiries about ChannelSmith, please contact [your email/contact info].
 
 ---
 
-**Status:** In Beta Development
-**Version:** 0.1.0-beta
+**Status:** Web MVP Complete - Post-Beta
+**Version:** 0.1.0-web-mvp
 **Last Updated:** February 8, 2026
