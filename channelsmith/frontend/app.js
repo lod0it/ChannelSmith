@@ -333,7 +333,7 @@ function switchTab(tabName) {
  * Reset channel labels to generic names (for Free template).
  */
 function resetChannelLabelsToGeneric() {
-    console.log('Resetting channel labels to generic names');
+    console.log('[resetChannelLabelsToGeneric] Resetting channel labels to generic names');
 
     const labels = {
         'label-red': 'Red Channel',
@@ -350,9 +350,9 @@ function resetChannelLabelsToGeneric() {
         const element = document.getElementById(elementId);
         if (element) {
             element.textContent = text;
-            console.log(`Reset ${elementId} to "${text}"`);
+            console.log(`[resetChannelLabelsToGeneric] Reset ${elementId} to "${text}"`);
         } else {
-            console.warn(`Element with id "${elementId}" not found`);
+            console.warn(`[resetChannelLabelsToGeneric] Element with id "${elementId}" not found`);
         }
     }
 }
@@ -363,18 +363,20 @@ function resetChannelLabelsToGeneric() {
  * For other templates (ORM, ORD), shows actual channel names.
  */
 function updatePackChannelLabels(templateName) {
-    console.log(`Updating channel labels for template: ${templateName}`);
+    console.log(`[updatePackChannelLabels] Called with template: ${templateName}`);
 
     // For Free template, use generic labels
     if (templateName === 'Free') {
+        console.log('[updatePackChannelLabels] Free template detected');
         resetChannelLabelsToGeneric();
         return;
     }
 
     // For other templates, fetch and display semantic channel names
+    console.log(`[updatePackChannelLabels] Fetching details for ${templateName}`);
     API.getTemplateDetails(templateName).then((templateDetails) => {
         state.templateDetails = templateDetails;
-        console.log(`Fetched template details for ${templateName}:`, templateDetails);
+        console.log(`[updatePackChannelLabels] Fetched template details for ${templateName}:`, templateDetails);
 
         // Channel position to element ID mapping
         const positionToElementId = {
@@ -393,10 +395,11 @@ function updatePackChannelLabels(templateName) {
         };
 
         // Update labels based on template channels
+        console.log('[updatePackChannelLabels] Starting to update labels for positions R, G, B, A');
         for (const position of ['R', 'G', 'B', 'A']) {
             const channelInfo = templateDetails.channels[position];
             if (!channelInfo) {
-                console.log(`No channel info for position ${position}`);
+                console.log(`[updatePackChannelLabels] No channel info for position ${position}`);
                 continue;
             }
 
@@ -404,20 +407,22 @@ function updatePackChannelLabels(templateName) {
             const previewLabelId = positionToPreviewLabelId[position];
             const readableName = CHANNEL_TYPE_LABELS[channelInfo.type] || channelInfo.type;
 
+            console.log(`[updatePackChannelLabels] Position ${position}: type="${channelInfo.type}" -> readableName="${readableName}"`);
+
             const labelElement = document.getElementById(elementId);
             if (labelElement) {
                 labelElement.textContent = readableName;
-                console.log(`Updated ${elementId} to "${readableName}"`);
+                console.log(`[updatePackChannelLabels] Updated ${elementId} to "${readableName}"`);
             } else {
-                console.warn(`Element with id "${elementId}" not found`);
+                console.warn(`[updatePackChannelLabels] Element with id "${elementId}" not found`);
             }
 
             const previewLabelElement = document.getElementById(previewLabelId);
             if (previewLabelElement) {
                 previewLabelElement.textContent = readableName;
-                console.log(`Updated ${previewLabelId} to "${readableName}"`);
+                console.log(`[updatePackChannelLabels] Updated ${previewLabelId} to "${readableName}"`);
             } else {
-                console.warn(`Element with id "${previewLabelId}" not found`);
+                console.warn(`[updatePackChannelLabels] Element with id "${previewLabelId}" not found`);
             }
         }
     }).catch((error) => {
@@ -900,14 +905,24 @@ function initApp() {
 
     // Set default template to 'Free' and add change listener
     const packTemplateSelect = document.getElementById('pack-template');
+    console.log('packTemplateSelect element:', packTemplateSelect);
     if (packTemplateSelect) {
+        console.log('Setting up pack template selector');
         packTemplateSelect.value = 'Free';
+        console.log('Initial template value:', packTemplateSelect.value);
+
         // Update labels when template changes
         packTemplateSelect.addEventListener('change', (e) => {
+            console.log('Pack template changed to:', e.target.value);
             updatePackChannelLabels(e.target.value);
         });
+        console.log('Event listener attached to pack template selector');
+
         // Initial label update for default template
+        console.log('Calling updatePackChannelLabels with "Free"');
         updatePackChannelLabels('Free');
+    } else {
+        console.error('Pack template selector element not found!');
     }
 
     // Load available templates
