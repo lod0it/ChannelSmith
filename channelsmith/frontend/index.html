@@ -28,8 +28,8 @@
                             <span></span>
                         </label>
                     </div>
-                    <button id="info-button" class="tab-button tab-icon-info hover-vibrate-section" title="Open documentation">
-                        Info
+                    <button id="info-button" class="btn-info tab-icon-info" title="Open documentation">
+                        <span>Info</span>
                     </button>
                 </div>
 
@@ -61,7 +61,7 @@
                                         <span id="label-red">Red Channel</span>
                                     </label>
                                     <div class="upload-zone" data-channel="red_channel">
-                                        <input type="file" accept="image/*" style="display: none;">
+                                        <input type="file" accept=".png,.jpg,.jpeg,.tga,.bmp,.webp,.gif,image/*" style="display: none;">
                                         <div class="pointer-events-none">
                                             <p class="text-gray-400 mb-2 icon-upload">Drag image here or click to upload</p>
                                             <p class="text-gray-500 text-sm">PNG, JPG, TGA...</p>
@@ -80,7 +80,7 @@
                                         <span id="label-green">Green Channel</span>
                                     </label>
                                     <div class="upload-zone" data-channel="green_channel">
-                                        <input type="file" accept="image/*" style="display: none;">
+                                        <input type="file" accept=".png,.jpg,.jpeg,.tga,.bmp,.webp,.gif,image/*" style="display: none;">
                                         <div class="pointer-events-none">
                                             <p class="text-gray-400 mb-2 icon-upload">Drag image here or click to upload</p>
                                             <p class="text-gray-500 text-sm">PNG, JPG, TGA...</p>
@@ -99,7 +99,7 @@
                                         <span id="label-blue">Blue Channel</span>
                                     </label>
                                     <div class="upload-zone" data-channel="blue_channel">
-                                        <input type="file" accept="image/*" style="display: none;">
+                                        <input type="file" accept=".png,.jpg,.jpeg,.tga,.bmp,.webp,.gif,image/*" style="display: none;">
                                         <div class="pointer-events-none">
                                             <p class="text-gray-400 mb-2 icon-upload">Drag image here or click to upload</p>
                                             <p class="text-gray-500 text-sm">PNG, JPG, TGA...</p>
@@ -118,7 +118,7 @@
                                         <span id="label-alpha">Alpha Channel (Optional)</span>
                                     </label>
                                     <div class="upload-zone" data-channel="alpha_channel">
-                                        <input type="file" accept="image/*" style="display: none;">
+                                        <input type="file" accept=".png,.jpg,.jpeg,.tga,.bmp,.webp,.gif,image/*" style="display: none;">
                                         <div class="pointer-events-none">
                                             <p class="text-gray-400 mb-2 icon-upload">Drag image here or click to upload</p>
                                             <p class="text-gray-500 text-sm">PNG, JPG, TGA...</p>
@@ -132,8 +132,8 @@
                             </div>
 
                             <!-- Pack Button -->
-                            <button id="pack-button" class="keycap mt-8 btn-icon-pack" title="Pack Texture">
-                                <aside class="letter"><span style="font-size: 12px; line-height: 1;">PACK</span></aside>
+                            <button id="pack-button" class="btn-12" title="Pack Texture">
+                                <span>Pack</span>
                             </button>
                         </div>
 
@@ -170,7 +170,7 @@
                                     <img id="result-image" class="preview-canvas" style="image-rendering: pixelated;">
                                 </div>
                                 <button id="download-packed" class="btn-secondary w-full mt-4 btn-icon-download">
-                                    Download Packed Image
+                                    <strong>Download Packed Image</strong>
                                 </button>
                             </div>
                         </div>
@@ -190,7 +190,7 @@
                                     Packed Texture Image
                                 </label>
                                 <div id="unpack-upload" class="upload-zone">
-                                    <input type="file" accept="image/*" style="display: none;">
+                                    <input type="file" accept=".png,.jpg,.jpeg,.tga,.bmp,.webp,.gif,image/*" style="display: none;">
                                     <div class="pointer-events-none">
                                         <p class="text-gray-400 mb-2 icon-upload">Drag packed image here or click to upload</p>
                                         <p class="text-gray-500 text-sm">PNG, JPG, TGA...</p>
@@ -203,8 +203,8 @@
                             </div>
 
                             <!-- Unpack Button -->
-                            <button id="unpack-button" class="keycap btn-icon-unpack">
-                                <aside class="letter"><span style="font-size: 12px; line-height: 1;">UNPACK</span></aside>
+                            <button id="unpack-button" class="btn-12">
+                                <span>Unpack</span>
                             </button>
                         </div>
 
@@ -226,16 +226,14 @@
                 </div>
 
                 <!-- Info Panel -->
-                <div id="info-panel" class="panel-section hidden">
-                    <div class="max-w-4xl mx-auto">
-                        <!-- Close Button -->
-                        <div class="flex justify-end mb-4">
-                            <button id="info-close-btn" class="text-gray-400 hover:text-[#ff6b35] transition-colors text-2xl" title="Close documentation">✕</button>
-                        </div>
-                        <!-- Scrollable Documentation Container -->
-                        <div id="info-content" class="bg-[#151515] rounded-lg border border-[#2a2a2a] p-8 max-h-[70vh] overflow-y-auto">
-                            <p class="text-gray-400 text-center py-8">Loading documentation...</p>
-                        </div>
+                <div id="info-panel" class="panel-section hidden w-full">
+                    <!-- Close Button -->
+                    <div class="flex justify-end mb-4 px-6">
+                        <button id="info-close-btn" class="text-gray-400 hover:text-[#ff6b35] transition-colors text-2xl" title="Close documentation">✕</button>
+                    </div>
+                    <!-- Scrollable Documentation Container (Full Width) -->
+                    <div id="info-content" class="bg-[#151515] rounded-lg border border-[#2a2a2a] p-8 max-h-[70vh] overflow-y-auto mx-6">
+                        <p class="text-gray-400 text-center py-8">Loading documentation...</p>
                     </div>
                 </div>
             </div>

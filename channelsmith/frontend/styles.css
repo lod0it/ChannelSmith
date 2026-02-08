@@ -64,6 +64,40 @@ body {
     user-select: none;
 }
 
+.switch::before {
+    content: "P";
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 22px;
+    font-weight: 900;
+    color: #9ca3af;
+    transition: color 0.2s ease;
+    user-select: none;
+    z-index: 1;
+    pointer-events: none;
+    line-height: 1;
+    padding: 8px;
+}
+
+.switch::after {
+    content: "U";
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 22px;
+    font-weight: 900;
+    color: #ff6b35;
+    transition: color 0.2s ease;
+    user-select: none;
+    z-index: 1;
+    pointer-events: none;
+    line-height: 1;
+    padding: 8px;
+}
+
 .switch-check {
     position: absolute;
     visibility: hidden;
@@ -79,44 +113,11 @@ body {
     user-select: none;
 }
 
-.switch-label::before {
-    background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
-    border-radius: 8px;
-    border: 1px solid #ff5a1f;
-    box-shadow: 0 2px 5px rgba(255, 107, 53, 0.6), 0 0 5px rgba(255, 159, 109, 0.5) inset;
-    content: "";
-    display: block;
-    height: 8px;
-    left: -20%;
-    position: absolute;
-    top: 20px;
-    transition: all 0.2s;
-    width: 8px;
-    z-index: 12;
-    user-select: none;
-}
-
-.switch-label::after {
-    background: linear-gradient(135deg, #1a4d50 0%, #0d3f42 100%);
-    border-radius: 8px;
-    border: 1px solid #003d42;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-    content: "";
-    display: block;
-    height: 8px;
-    right: -20%;
-    position: absolute;
-    top: 20px;
-    transition: all 0.2s;
-    width: 8px;
-    z-index: 12;
-    user-select: none;
-}
 
 .switch-label span {
-    background: linear-gradient(#2a2a2a, #1a1a1a);
+    background: linear-gradient(#9d9d9d, #6b6157);
     border-radius: 30px;
-    border: 1px solid #0a0a0a;
+    border: 1px solid #b3a6a6;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.5), 0 1px 1px rgba(255, 255, 255, 0.1) inset, 0 -2px 0 rgba(0, 0, 0, 0.2) inset;
     display: block;
     height: 38px;
@@ -126,60 +127,40 @@ body {
     transition: all 0.2s linear;
     width: 63px;
     user-select: none;
+    z-index: 3;
 }
 
 .switch-label span::before {
-    background: linear-gradient(left, rgba(48, 48, 48, 0.4), rgba(34, 34, 34, 0.4));
-    border-radius: 30px 8px 8px 30px;
-    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2) inset;
-    content: "📦";
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    height: 33px;
-    left: 2px;
-    position: absolute;
-    top: 2px;
-    width: 28px;
-    user-select: none;
-    color: #ffffff;
+    content: "";
+    display: none;
 }
 
 .switch-label span::after {
-    background: linear-gradient(right, rgba(48, 48, 48, 0.4), rgba(34, 34, 34, 0.4));
-    border-radius: 8px 30px 30px 8px;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2) inset;
-    content: "📂";
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    height: 33px;
-    position: absolute;
-    right: 2px;
-    top: 2px;
-    width: 28px;
-    user-select: none;
-    color: #ffffff;
+    content: "";
+    display: none;
 }
 
 .switch-check:checked + .switch-label span {
     left: 68px;
 }
 
-.switch-check:checked + .switch-label::before {
-    background: linear-gradient(135deg, #1a4d50 0%, #0d3f42 100%);
-    border: 1px solid #003d42;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-    user-select: none;
+/* Highlight colors for the letters based on toggle state */
+/* When toggle is OFF (unchecked) - Pack mode, P is highlighted */
+.switch:has(.switch-check:not(:checked))::after {
+    color: #ff6b35 !important;
 }
 
-.switch-check:checked + .switch-label::after {
-    background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
-    border: 1px solid #ff5a1f;
-    box-shadow: 0 2px 5px rgba(255, 107, 53, 0.6), 0 0 5px rgba(255, 159, 109, 0.5) inset;
-    user-select: none;
+.switch:has(.switch-check:not(:checked))::before {
+    color: #9ca3af !important;
+}
+
+/* When toggle is ON (checked) - Unpack mode, U is highlighted */
+.switch:has(.switch-check:checked)::before {
+    color: #ff6b35 !important;
+}
+
+.switch:has(.switch-check:checked)::after {
+    color: #9ca3af !important;
 }
 
 /* Tab Navigation */
@@ -927,4 +908,84 @@ canvas {
 
 .pill-button-download:active {
     transform: translateY(0);
+}
+
+/* Info Button - Fire Button Style in Pill Shape */
+.btn-info {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-appearance: button;
+    background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+    color: #fff;
+    cursor: pointer;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif;
+    font-size: 100%;
+    font-weight: 900;
+    line-height: 1.5;
+    padding: 0;
+    text-transform: uppercase;
+    display: inline-block;
+    border-radius: 99rem;
+    border: 2px solid #ff5a1f;
+    padding: 0.6rem 1.6rem;
+    position: relative;
+    box-shadow: 0 0 20px rgba(255, 107, 53, 0.4);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.btn-info:disabled {
+    cursor: default;
+    opacity: 0.5;
+}
+
+.btn-info:after,
+.btn-info:before {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.3) 25%,
+        transparent 0,
+        transparent 50%,
+        rgba(255, 255, 255, 0.3) 0,
+        rgba(255, 255, 255, 0.3) 75%,
+        transparent 0
+    );
+    content: "";
+    inset: 0;
+    position: absolute;
+    transform: translateY(var(--progress, 100%));
+    transition: transform 0.2s ease;
+    z-index: 1;
+}
+
+.btn-info:after {
+    --progress: -100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0,
+        transparent 25%,
+        rgba(255, 255, 255, 0.3) 0,
+        rgba(255, 255, 255, 0.3) 50%,
+        transparent 0,
+        transparent 75%,
+        rgba(255, 255, 255, 0.3) 0
+    );
+    z-index: 0;
+}
+
+.btn-info span {
+    mix-blend-mode: normal;
+    position: relative;
+    z-index: 2;
+}
+
+.btn-info:hover:after,
+.btn-info:hover:before {
+    --progress: 0;
+}
+
+.btn-info:hover {
+    background: linear-gradient(135deg, #ff8c42 0%, #ffa65a 100%);
+    box-shadow: 0 0 30px rgba(255, 107, 53, 0.6);
+    transform: translateY(-2px);
 }
