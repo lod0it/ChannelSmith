@@ -13,7 +13,7 @@
         <header class="border-b border-gray-800 py-6 px-6">
             <div class="max-w-6xl mx-auto">
                 <h1 class="text-4xl font-bold text-teal-400 mb-2">ChannelSmith</h1>
-                <p class="text-gray-400 text-lg">Professional Texture Channel Packer</p>
+                <p class="text-gray-400 text-lg">Texture Packing Tool for Game Artists</p>
             </div>
         </header>
 
@@ -21,12 +21,15 @@
         <main class="flex-1 p-6">
             <div class="max-w-6xl mx-auto">
                 <!-- Tab Navigation -->
-                <div class="flex gap-2 mb-8 border-b border-gray-800">
-                    <button id="tab-pack" class="tab-button active" data-tab="pack">
-                        <span class="text-lg">📦</span> Pack Channels
+                <div class="flex gap-2 mb-8 border-b border-gray-800 items-center">
+                    <button id="tab-pack" class="tab-button active hover-vibrate-section" data-tab="pack">
+                        <span class="text-lg">📦</span> Pack Texture
                     </button>
-                    <button id="tab-unpack" class="tab-button" data-tab="unpack">
+                    <button id="tab-unpack" class="tab-button hover-vibrate-section" data-tab="unpack">
                         <span class="text-lg">📂</span> Unpack Texture
+                    </button>
+                    <button id="info-button" class="tab-button hover-vibrate-section ml-auto" title="Open documentation">
+                        <span class="text-lg">ℹ️</span> Info
                     </button>
                 </div>
 
@@ -37,12 +40,13 @@
                         <div>
                             <h2 class="text-2xl font-bold mb-6 text-teal-400">Upload Channels</h2>
 
-                            <!-- Template Selector -->
+                            <!-- Preset Selector -->
                             <div class="mb-6">
                                 <label class="block text-sm font-medium mb-2 text-gray-300">
-                                    Template
+                                    Preset
                                 </label>
                                 <select id="pack-template" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-gray-100 hover:border-teal-500 focus:border-teal-500 focus:outline-none transition-colors">
+                                    <option value="Free">Free (Append Grayscale Textures to your preferences!)</option>
                                     <option value="ORM">ORM (Occlusion-Roughness-Metallic)</option>
                                     <option value="ORD">ORD (Occlusion-Roughness-Displacement)</option>
                                 </select>

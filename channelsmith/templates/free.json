@@ -1,0 +1,26 @@
+{
+  "name": "Free",
+  "description": "Free - Append Grayscale Textures to your preferences",
+  "channels": {
+    "R": {
+      "type": "ambient_occlusion",
+      "default": 1.0,
+      "description": "Red Channel - Any grayscale texture"
+    },
+    "G": {
+      "type": "roughness",
+      "default": 0.5,
+      "description": "Green Channel - Any grayscale texture"
+    },
+    "B": {
+      "type": "metallic",
+      "default": 0.0,
+      "description": "Blue Channel - Any grayscale texture"
+    },
+    "A": {
+      "type": "opacity",
+      "default": 1.0,
+      "description": "Alpha Channel - Any grayscale texture (optional)"
+    }
+  }
+}

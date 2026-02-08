@@ -11,8 +11,8 @@
 
 const state = {
     currentTab: 'pack',
-    packTemplate: 'ORM',
-    unpackTemplate: 'ORM',
+    packTemplate: 'Free',
+    unpackTemplate: 'Free',
     packChannels: {
         red_channel: null,
         green_channel: null,
@@ -501,9 +501,19 @@ function initApp() {
     // Setup tab switching
     document.querySelectorAll('.tab-button').forEach(btn => {
         btn.addEventListener('click', () => {
-            switchTab(btn.dataset.tab);
+            if (btn.dataset.tab) {
+                switchTab(btn.dataset.tab);
+            }
         });
     });
+
+    // Setup Info button
+    const infoButton = document.getElementById('info-button');
+    if (infoButton) {
+        infoButton.addEventListener('click', () => {
+            window.open('https://github.com/cgCrate/ChannelSmith', '_blank');
+        });
+    }
 
     // Setup pack upload zones
     document.querySelectorAll('#pack-channels .upload-zone').forEach(zone => {
@@ -531,6 +541,12 @@ function initApp() {
 
     // Initialize tab visibility
     switchTab('pack');
+
+    // Set default template to 'Free'
+    const packTemplateSelect = document.getElementById('pack-template');
+    if (packTemplateSelect) {
+        packTemplateSelect.value = 'Free';
+    }
 
     // Load available templates
     API.getTemplates().then(data => {
