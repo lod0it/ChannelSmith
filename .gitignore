@@ -94,3 +94,4 @@ test_output/
 # But keep template examples
 !channelsmith/templates/*.json
 !examples/*.png
+.claude/
