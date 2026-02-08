@@ -330,13 +330,51 @@ function switchTab(tabName) {
 }
 
 /**
- * Update pack channel labels based on the selected template.
- * Fetches template details and updates the UI labels to show the actual channel names.
+ * Reset channel labels to generic names (for Free template).
  */
-async function updatePackChannelLabels(templateName) {
-    try {
-        const templateDetails = await API.getTemplateDetails(templateName);
+function resetChannelLabelsToGeneric() {
+    console.log('Resetting channel labels to generic names');
+
+    const labels = {
+        'label-red': 'Red Channel',
+        'label-green': 'Green Channel',
+        'label-blue': 'Blue Channel',
+        'label-alpha': 'Alpha Channel (Optional)',
+        'preview-label-red': 'Red',
+        'preview-label-green': 'Green',
+        'preview-label-blue': 'Blue',
+        'preview-label-alpha': 'Alpha',
+    };
+
+    for (const [elementId, text] of Object.entries(labels)) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.textContent = text;
+            console.log(`Reset ${elementId} to "${text}"`);
+        } else {
+            console.warn(`Element with id "${elementId}" not found`);
+        }
+    }
+}
+
+/**
+ * Update pack channel labels based on the selected template.
+ * For "Free" template, uses generic Red/Green/Blue/Alpha labels.
+ * For other templates (ORM, ORD), shows actual channel names.
+ */
+function updatePackChannelLabels(templateName) {
+    console.log(`Updating channel labels for template: ${templateName}`);
+
+    // For Free template, use generic labels
+    if (templateName === 'Free') {
+        resetChannelLabelsToGeneric();
+        return;
+    }
+
+    // For other templates, fetch and display semantic channel names
+    API.getTemplateDetails(templateName).then((templateDetails) => {
         state.templateDetails = templateDetails;
+        console.log(`Fetched template details for ${templateName}:`, templateDetails);
 
         // Channel position to element ID mapping
         const positionToElementId = {
@@ -355,7 +393,13 @@ async function updatePackChannelLabels(templateName) {
         };
 
         // Update labels based on template channels
-        for (const [position, channelInfo] of Object.entries(templateDetails.channels)) {
+        for (const position of ['R', 'G', 'B', 'A']) {
+            const channelInfo = templateDetails.channels[position];
+            if (!channelInfo) {
+                console.log(`No channel info for position ${position}`);
+                continue;
+            }
+
             const elementId = positionToElementId[position];
             const previewLabelId = positionToPreviewLabelId[position];
             const readableName = CHANNEL_TYPE_LABELS[channelInfo.type] || channelInfo.type;
@@ -363,16 +407,22 @@ async function updatePackChannelLabels(templateName) {
             const labelElement = document.getElementById(elementId);
             if (labelElement) {
                 labelElement.textContent = readableName;
+                console.log(`Updated ${elementId} to "${readableName}"`);
+            } else {
+                console.warn(`Element with id "${elementId}" not found`);
             }
 
             const previewLabelElement = document.getElementById(previewLabelId);
             if (previewLabelElement) {
                 previewLabelElement.textContent = readableName;
+                console.log(`Updated ${previewLabelId} to "${readableName}"`);
+            } else {
+                console.warn(`Element with id "${previewLabelId}" not found`);
             }
         }
-    } catch (error) {
-        console.error('Failed to update channel labels:', error);
-    }
+    }).catch((error) => {
+        console.error(`Failed to update channel labels for ${templateName}:`, error);
+    });
 }
 
 // ============================================================================
