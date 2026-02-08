@@ -14,6 +14,9 @@ import tkinter as tk
 from tkinter import ttk
 import logging
 
+from channelsmith.gui.packer_panel import PackerPanel
+from channelsmith.gui.unpacker_panel import UnpackerPanel
+
 logger = logging.getLogger(__name__)
 
 
@@ -61,21 +64,21 @@ class MainWindow(tk.Tk):
         help_menu.add_command(label="Documentation", command=self._on_docs)
 
     def _create_content(self) -> None:
-        """Create main content frame (placeholder for tabs)."""
+        """Create main content frame with notebook tabs."""
         self.content_frame = tk.Frame(self)
         self.content_frame.pack(fill="both", expand=True, padx=5, pady=5)
 
-        # TODO: Create notebook (ttk.Notebook) with Pack/Unpack tabs
-        # See B7 (Layout Integration)
-        placeholder = tk.Label(
-            self.content_frame,
-            text="GUI Panels Go Here",
-            font=("Arial", 12),
-            bg="lightgray",
-            padx=20,
-            pady=20,
-        )
-        placeholder.pack(fill="both", expand=True)
+        # Create notebook with Pack/Unpack tabs
+        self.notebook = ttk.Notebook(self.content_frame)
+        self.notebook.pack(fill="both", expand=True)
+
+        # Pack tab
+        self._packer_panel = PackerPanel(self.notebook)
+        self.notebook.add(self._packer_panel, text="Pack")
+
+        # Unpack tab
+        self._unpacker_panel = UnpackerPanel(self.notebook)
+        self.notebook.add(self._unpacker_panel, text="Unpack")
 
     def _create_status_bar(self) -> None:
         """Create status bar at bottom of window."""
