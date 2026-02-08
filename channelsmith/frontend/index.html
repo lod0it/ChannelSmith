@@ -7,12 +7,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-900 text-gray-100">
+<body class="bg-[#0a0a0a] text-gray-100">
     <div id="app" class="min-h-screen flex flex-col">
         <!-- Header -->
-        <header class="border-b border-gray-800 py-6 px-6">
+        <header class="border-b border-[#2a2a2a] py-6 px-6">
             <div class="max-w-6xl mx-auto">
-                <h1 class="text-4xl font-bold text-teal-400 mb-2">ChannelSmith</h1>
+                <h1 class="text-4xl font-bold text-[#ff6b35] mb-2">ChannelSmith</h1>
                 <p class="text-gray-400 text-lg">Texture Packing Tool for Game Artists</p>
             </div>
         </header>
@@ -21,7 +21,7 @@
         <main class="flex-1 p-6">
             <div class="max-w-6xl mx-auto">
                 <!-- Tab Navigation -->
-                <div class="flex gap-2 mb-8 border-b border-gray-800 items-center">
+                <div class="flex gap-2 mb-8 border-b border-[#2a2a2a] items-center">
                     <button id="tab-pack" class="tab-button active hover-vibrate-section" data-tab="pack">
                         <span class="text-lg">📦</span> Pack Texture
                     </button>
@@ -38,14 +38,14 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         <!-- Upload Section -->
                         <div>
-                            <h2 class="text-2xl font-bold mb-6 text-teal-400">Upload Channels</h2>
+                            <h2 class="text-2xl font-bold mb-6 text-[#ff6b35]">Upload Channels</h2>
 
                             <!-- Preset Selector -->
                             <div class="mb-6">
                                 <label class="block text-sm font-medium mb-2 text-gray-300">
                                     Preset
                                 </label>
-                                <select id="pack-template" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-gray-100 hover:border-teal-500 focus:border-teal-500 focus:outline-none transition-colors">
+                                <select id="pack-template" class="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-4 py-2 text-gray-100 hover:border-[#ff6b35] focus:border-[#ff8c42] focus:outline-none transition-colors">
                                     <option value="Free">Free Mode (Have fun packing!)</option>
                                     <option value="ORM">ORM (Occlusion-Roughness-Metallic)</option>
                                     <option value="ORD">ORD (Occlusion-Roughness-Displacement)</option>
@@ -139,26 +139,26 @@
 
                         <!-- Preview Section -->
                         <div>
-                            <h2 class="text-2xl font-bold mb-6 text-teal-400">Preview</h2>
+                            <h2 class="text-2xl font-bold mb-6 text-[#ff6b35]">Preview</h2>
 
                             <!-- Upload Previews -->
                             <div id="pack-previews" class="space-y-4 mb-8">
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-2 gap-6">
                                     <div class="preview-card">
                                         <div class="preview-label">Red</div>
-                                        <canvas id="preview-red" class="preview-canvas" width="200" height="200"></canvas>
+                                        <canvas id="preview-red" class="preview-canvas" width="240" height="240"></canvas>
                                     </div>
                                     <div class="preview-card">
                                         <div class="preview-label">Green</div>
-                                        <canvas id="preview-green" class="preview-canvas" width="200" height="200"></canvas>
+                                        <canvas id="preview-green" class="preview-canvas" width="240" height="240"></canvas>
                                     </div>
                                     <div class="preview-card">
                                         <div class="preview-label">Blue</div>
-                                        <canvas id="preview-blue" class="preview-canvas" width="200" height="200"></canvas>
+                                        <canvas id="preview-blue" class="preview-canvas" width="240" height="240"></canvas>
                                     </div>
                                     <div class="preview-card">
                                         <div class="preview-label">Alpha</div>
-                                        <canvas id="preview-alpha" class="preview-canvas" width="200" height="200"></canvas>
+                                        <canvas id="preview-alpha" class="preview-canvas" width="240" height="240"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -182,7 +182,7 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         <!-- Upload Section -->
                         <div>
-                            <h2 class="text-2xl font-bold mb-6 text-teal-400">Upload Packed Texture</h2>
+                            <h2 class="text-2xl font-bold mb-6 text-[#ff6b35]">Upload Packed Texture</h2>
 
                             <!-- Image Upload Zone -->
                             <div class="mb-6">
@@ -210,7 +210,7 @@
 
                         <!-- Results Section -->
                         <div>
-                            <h2 class="text-2xl font-bold mb-6 text-teal-400">Extracted Channels</h2>
+                            <h2 class="text-2xl font-bold mb-6 text-[#ff6b35]">Extracted Channels</h2>
 
                             <!-- Channel Results Grid -->
                             <div id="unpack-results" class="space-y-4">
@@ -229,7 +229,7 @@
 
         <!-- Progress Indicator -->
         <div id="progress-container" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-gray-800 rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="bg-[#151515] rounded-lg p-8 max-w-md w-full mx-4">
                 <p class="text-gray-100 mb-4" id="progress-message">Processing...</p>
                 <div class="progress-bar">
                     <div class="progress-bar-fill" style="width: 0%"></div>

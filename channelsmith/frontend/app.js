@@ -199,8 +199,8 @@ function handleFileSelected(channel, file, zoneElement) {
     state.packChannels[channel] = file;
 
     // Update UI
-    zoneElement.style.borderColor = '#14b8a6';
-    zoneElement.style.backgroundColor = 'rgba(13, 115, 119, 0.1)';
+    zoneElement.style.borderColor = '#ff8c42';
+    zoneElement.style.backgroundColor = 'rgba(255, 107, 53, 0.1)';
 
     // Show clear button
     const clearBtn = zoneElement.parentElement.querySelector('.clear-btn');
@@ -225,14 +225,14 @@ function displayImagePreview(file, canvas) {
 
     img.onload = () => {
         // Clear canvas with checkerboard
-        ctx.fillStyle = '#1a1a1a';
+        ctx.fillStyle = '#0a0a0a';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Draw checkerboard pattern
         for (let i = 0; i < canvas.width; i += 20) {
             for (let j = 0; j < canvas.height; j += 20) {
                 if ((i / 20 + j / 20) % 2 === 0) {
-                    ctx.fillStyle = '#2d2d2d';
+                    ctx.fillStyle = '#0f0f0f';
                     ctx.fillRect(i, j, 20, 20);
                 }
             }
@@ -280,7 +280,7 @@ function clearChannelUpload(channel) {
         const previewCanvas = document.getElementById(previewId);
         if (previewCanvas) {
             const ctx = previewCanvas.getContext('2d');
-            ctx.fillStyle = '#1a1a1a';
+            ctx.fillStyle = '#0a0a0a';
             ctx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
         }
     }
@@ -447,8 +447,8 @@ function setupUnpackUploadZone() {
 
     function updateFeedback(file) {
         state.unpackImage = file;
-        zone.style.borderColor = '#14b8a6';
-        zone.style.backgroundColor = 'rgba(13, 115, 119, 0.1)';
+        zone.style.borderColor = '#ff8c42';
+        zone.style.backgroundColor = 'rgba(255, 107, 53, 0.1)';
         filenameSpan.textContent = file.name;
         feedback.classList.remove('hidden');
         clearBtn.classList.remove('hidden');
