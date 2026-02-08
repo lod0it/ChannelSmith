@@ -142,6 +142,18 @@ function switchTab(tabName) {
 // FILE HANDLING
 // ============================================================================
 
+function isImageFile(file) {
+    // Check MIME type for standard image formats
+    if (file.type.startsWith('image/')) {
+        return true;
+    }
+    // Also accept TGA files by extension (MIME type often not recognized by browsers)
+    if (file.name.toLowerCase().endsWith('.tga')) {
+        return true;
+    }
+    return false;
+}
+
 function setupUploadZone(zoneElement) {
     const fileInput = zoneElement.querySelector('input[type="file"]');
     const channel = zoneElement.dataset.channel;
@@ -171,10 +183,13 @@ function setupUploadZone(zoneElement) {
         zoneElement.classList.remove('dragover');
 
         const files = e.dataTransfer.files;
-        if (files.length > 0 && files[0].type.startsWith('image/')) {
-            handleFileSelected(channel, files[0], zoneElement);
-        } else {
-            showError('Please drop an image file');
+        if (files.length > 0) {
+            const file = files[0];
+            if (isImageFile(file)) {
+                handleFileSelected(channel, file, zoneElement);
+            } else {
+                showError('Please drop an image file');
+            }
         }
     });
 }
@@ -184,15 +199,13 @@ function handleFileSelected(channel, file, zoneElement) {
     state.packChannels[channel] = file;
 
     // Update UI
-    const fileName = file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name;
     zoneElement.style.borderColor = '#14b8a6';
     zoneElement.style.backgroundColor = 'rgba(13, 115, 119, 0.1)';
 
-    // Update label
-    const label = zoneElement.parentElement.querySelector('label');
-    if (label) {
-        const originalText = label.textContent;
-        label.innerHTML = `${originalText.substring(0, originalText.lastIndexOf('('))}(${fileName})`;
+    // Show clear button
+    const clearBtn = zoneElement.parentElement.querySelector('.clear-btn');
+    if (clearBtn) {
+        clearBtn.classList.remove('hidden');
     }
 
     // Show preview
@@ -235,6 +248,39 @@ function displayImagePreview(file, canvas) {
     };
 
     img.src = URL.createObjectURL(file);
+}
+
+function clearChannelUpload(channel) {
+    // Clear state
+    state.packChannels[channel] = null;
+
+    // Find zone and reset UI
+    const zone = document.querySelector(`[data-channel="${channel}"]`);
+    if (zone) {
+        zone.style.borderColor = '';
+        zone.style.backgroundColor = '';
+
+        // Reset file input
+        const fileInput = zone.querySelector('input[type="file"]');
+        if (fileInput) {
+            fileInput.value = '';
+        }
+
+        // Hide clear button
+        const clearBtn = zone.parentElement.querySelector('.clear-btn');
+        if (clearBtn) {
+            clearBtn.classList.add('hidden');
+        }
+
+        // Clear preview canvas
+        const previewId = `preview-${channel.split('_')[0]}`;
+        const previewCanvas = document.getElementById(previewId);
+        if (previewCanvas) {
+            const ctx = previewCanvas.getContext('2d');
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
+        }
+    }
 }
 
 // ============================================================================
@@ -302,8 +348,8 @@ async function handleUnpack() {
             return;
         }
 
-        const template = document.getElementById('unpack-template').value;
-        state.unpackTemplate = template;
+        // Auto-detect template from image or use default
+        const template = state.unpackTemplate || 'ORM';
 
         showProgress('Unpacking texture...');
 
@@ -326,25 +372,23 @@ function displayUnpackedChannels(channels) {
     const resultsContainer = document.getElementById('unpack-results');
     resultsContainer.innerHTML = '';
 
-    // Channel display info
-    const channelInfo = {
-        ambient_occlusion: { label: 'Ambient Occlusion', color: 'bg-gray-600' },
-        roughness: { label: 'Roughness', color: 'bg-gray-600' },
-        metallic: { label: 'Metallic', color: 'bg-gray-600' },
-        displacement: { label: 'Displacement', color: 'bg-gray-600' },
-        height: { label: 'Height', color: 'bg-gray-600' },
-        opacity: { label: 'Opacity', color: 'bg-gray-600' },
+    // Channel position labels
+    const channelLabels = {
+        R: { label: 'Red Channel', color: 'bg-red-600' },
+        G: { label: 'Green Channel', color: 'bg-green-600' },
+        B: { label: 'Blue Channel', color: 'bg-blue-600' },
+        A: { label: 'Alpha Channel', color: 'bg-gray-600' },
     };
 
-    for (const [channelType, base64Data] of Object.entries(channels)) {
-        const info = channelInfo[channelType] || { label: channelType, color: 'bg-gray-600' };
+    for (const [channelPos, base64Data] of Object.entries(channels)) {
+        const info = channelLabels[channelPos] || { label: channelPos, color: 'bg-gray-600' };
 
         const card = document.createElement('div');
         card.className = 'preview-card';
         card.innerHTML = `
             <div class="flex justify-between items-start mb-3">
                 <div class="preview-label">${info.label}</div>
-                <button class="btn-secondary text-xs py-1 px-2" onclick="downloadChannel('${channelType}', '${base64Data}')">
+                <button class="btn-secondary text-xs py-1 px-2" onclick="downloadChannel('${channelPos}', '${base64Data}')">
                     📥 Download
                 </button>
             </div>
@@ -369,6 +413,16 @@ function downloadChannel(channelType, base64Data) {
 function setupUnpackUploadZone() {
     const zone = document.getElementById('unpack-upload');
     const fileInput = zone.querySelector('input[type="file"]');
+    const feedback = document.getElementById('unpack-upload-feedback');
+    const filenameSpan = document.getElementById('unpack-filename');
+
+    function updateFeedback(file) {
+        state.unpackImage = file;
+        zone.style.borderColor = '#14b8a6';
+        zone.style.backgroundColor = 'rgba(13, 115, 119, 0.1)';
+        filenameSpan.textContent = file.name;
+        feedback.classList.remove('hidden');
+    }
 
     // Click to upload
     zone.addEventListener('click', () => fileInput.click());
@@ -377,9 +431,7 @@ function setupUnpackUploadZone() {
     fileInput.addEventListener('change', (e) => {
         if (e.target.length > 0 || (e.target.files && e.target.files.length > 0)) {
             const file = e.target.files[0];
-            state.unpackImage = file;
-            zone.style.borderColor = '#14b8a6';
-            zone.style.backgroundColor = 'rgba(13, 115, 119, 0.1)';
+            updateFeedback(file);
         }
     });
 
@@ -398,12 +450,13 @@ function setupUnpackUploadZone() {
         zone.classList.remove('dragover');
 
         const files = e.dataTransfer.files;
-        if (files.length > 0 && files[0].type.startsWith('image/')) {
-            state.unpackImage = files[0];
-            zone.style.borderColor = '#14b8a6';
-            zone.style.backgroundColor = 'rgba(13, 115, 119, 0.1)';
-        } else {
-            showError('Please drop an image file');
+        if (files.length > 0) {
+            const file = files[0];
+            if (isImageFile(file)) {
+                updateFeedback(file);
+            } else {
+                showError('Please drop an image file');
+            }
         }
     });
 }
@@ -419,6 +472,16 @@ function initApp() {
     // Setup pack upload zones
     document.querySelectorAll('#pack-channels .upload-zone').forEach(zone => {
         setupUploadZone(zone);
+    });
+
+    // Setup clear buttons
+    document.querySelectorAll('.clear-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const channel = btn.dataset.channel;
+            clearChannelUpload(channel);
+        });
     });
 
     // Setup pack button

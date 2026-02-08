@@ -50,11 +50,11 @@
 
                             <!-- Channel Upload Zones -->
                             <div id="pack-channels" class="space-y-4">
-                                <!-- Red Channel (AO) -->
+                                <!-- Red Channel -->
                                 <div class="upload-group">
                                     <label class="block text-sm font-medium mb-2 text-gray-300">
                                         <span class="inline-block w-4 h-4 bg-red-600 rounded mr-2"></span>
-                                        Red Channel (Ambient Occlusion)
+                                        Red Channel
                                     </label>
                                     <div class="upload-zone" data-channel="red_channel">
                                         <input type="file" accept="image/*" style="display: none;">
@@ -63,14 +63,17 @@
                                             <p class="text-gray-500 text-sm">PNG, JPG, TGA...</p>
                                         </div>
                                     </div>
-                                    <p class="text-xs text-gray-500 mt-1">Default: White (1.0)</p>
+                                    <div class="flex justify-between items-center mt-2">
+                                        <p class="text-xs text-gray-500">Default: White (1.0)</p>
+                                        <button class="clear-btn hidden text-xs text-red-400 hover:text-red-300" data-channel="red_channel">Clear</button>
+                                    </div>
                                 </div>
 
-                                <!-- Green Channel (Roughness) -->
+                                <!-- Green Channel -->
                                 <div class="upload-group">
                                     <label class="block text-sm font-medium mb-2 text-gray-300">
                                         <span class="inline-block w-4 h-4 bg-green-600 rounded mr-2"></span>
-                                        Green Channel (Roughness)
+                                        Green Channel
                                     </label>
                                     <div class="upload-zone" data-channel="green_channel">
                                         <input type="file" accept="image/*" style="display: none;">
@@ -79,14 +82,17 @@
                                             <p class="text-gray-500 text-sm">PNG, JPG, TGA...</p>
                                         </div>
                                     </div>
-                                    <p class="text-xs text-gray-500 mt-1">Default: Mid-Gray (0.5)</p>
+                                    <div class="flex justify-between items-center mt-2">
+                                        <p class="text-xs text-gray-500">Default: Mid-Gray (0.5)</p>
+                                        <button class="clear-btn hidden text-xs text-red-400 hover:text-red-300" data-channel="green_channel">Clear</button>
+                                    </div>
                                 </div>
 
-                                <!-- Blue Channel (Metallic) -->
+                                <!-- Blue Channel -->
                                 <div class="upload-group">
                                     <label class="block text-sm font-medium mb-2 text-gray-300">
                                         <span class="inline-block w-4 h-4 bg-blue-600 rounded mr-2"></span>
-                                        Blue Channel (Metallic)
+                                        Blue Channel
                                     </label>
                                     <div class="upload-zone" data-channel="blue_channel">
                                         <input type="file" accept="image/*" style="display: none;">
@@ -95,7 +101,10 @@
                                             <p class="text-gray-500 text-sm">PNG, JPG, TGA...</p>
                                         </div>
                                     </div>
-                                    <p class="text-xs text-gray-500 mt-1">Default: Black (0.0)</p>
+                                    <div class="flex justify-between items-center mt-2">
+                                        <p class="text-xs text-gray-500">Default: Black (0.0)</p>
+                                        <button class="clear-btn hidden text-xs text-red-400 hover:text-red-300" data-channel="blue_channel">Clear</button>
+                                    </div>
                                 </div>
 
                                 <!-- Alpha Channel (Optional) -->
@@ -111,7 +120,10 @@
                                             <p class="text-gray-500 text-sm">PNG, JPG, TGA...</p>
                                         </div>
                                     </div>
-                                    <p class="text-xs text-gray-500 mt-1">Default: White (1.0)</p>
+                                    <div class="flex justify-between items-center mt-2">
+                                        <p class="text-xs text-gray-500">Default: White (1.0)</p>
+                                        <button class="clear-btn hidden text-xs text-red-400 hover:text-red-300" data-channel="alpha_channel">Clear</button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -129,15 +141,15 @@
                             <div id="pack-previews" class="space-y-4 mb-8">
                                 <div class="grid grid-cols-2 gap-4">
                                     <div class="preview-card">
-                                        <div class="preview-label">Red (AO)</div>
+                                        <div class="preview-label">Red</div>
                                         <canvas id="preview-red" class="preview-canvas" width="200" height="200"></canvas>
                                     </div>
                                     <div class="preview-card">
-                                        <div class="preview-label">Green (Roughness)</div>
+                                        <div class="preview-label">Green</div>
                                         <canvas id="preview-green" class="preview-canvas" width="200" height="200"></canvas>
                                     </div>
                                     <div class="preview-card">
-                                        <div class="preview-label">Blue (Metallic)</div>
+                                        <div class="preview-label">Blue</div>
                                         <canvas id="preview-blue" class="preview-canvas" width="200" height="200"></canvas>
                                     </div>
                                     <div class="preview-card">
@@ -168,17 +180,6 @@
                         <div>
                             <h2 class="text-2xl font-bold mb-6 text-teal-400">Upload Packed Texture</h2>
 
-                            <!-- Template Selector -->
-                            <div class="mb-6">
-                                <label class="block text-sm font-medium mb-2 text-gray-300">
-                                    Template
-                                </label>
-                                <select id="unpack-template" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-gray-100 hover:border-teal-500 focus:border-teal-500 focus:outline-none transition-colors">
-                                    <option value="ORM">ORM (Occlusion-Roughness-Metallic)</option>
-                                    <option value="ORD">ORD (Occlusion-Roughness-Displacement)</option>
-                                </select>
-                            </div>
-
                             <!-- Image Upload Zone -->
                             <div class="mb-6">
                                 <label class="block text-sm font-medium mb-2 text-gray-300">
@@ -191,6 +192,7 @@
                                         <p class="text-gray-500 text-sm">PNG, JPG, TGA...</p>
                                     </div>
                                 </div>
+                                <p id="unpack-upload-feedback" class="text-xs text-gray-500 mt-2 hidden">File uploaded: <span id="unpack-filename"></span></p>
                             </div>
 
                             <!-- Unpack Button -->

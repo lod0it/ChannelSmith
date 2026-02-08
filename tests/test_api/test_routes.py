@@ -278,10 +278,10 @@ class TestUnpackEndpoint:
 
         data = json.loads(response.data)
         channels = data["channels"]
-        # ORM should have AO, Roughness, Metallic
-        assert "ambient_occlusion" in channels
-        assert "roughness" in channels
-        assert "metallic" in channels
+        # ORM uses R (AO), G (Roughness), B (Metallic)
+        assert "R" in channels
+        assert "G" in channels
+        assert "B" in channels
 
     def test_unpack_ord_template(self, client, rgb_image):
         """Unpack with ORD template should return correct channels."""
@@ -296,10 +296,10 @@ class TestUnpackEndpoint:
 
         data = json.loads(response.data)
         channels = data["channels"]
-        # ORD should have AO, Roughness, Displacement
-        assert "ambient_occlusion" in channels
-        assert "roughness" in channels
-        assert "displacement" in channels
+        # ORD uses R (AO), G (Roughness), B (Displacement)
+        assert "R" in channels
+        assert "G" in channels
+        assert "B" in channels
 
     def test_unpack_rgba_image(self, client, rgba_image):
         """Unpack should work with RGBA images."""

@@ -183,7 +183,13 @@ def unpack() -> tuple:
             logger.error("Error unpacking texture: %s", e)
             return jsonify({"error": f"Failed to unpack texture: {str(e)}"}), 400
 
+        # Build reverse mapping from semantic names to channel positions
+        position_map = {}
+        for channel_pos, channel_map in template.get_used_channels().items():
+            position_map[channel_map.map_type] = channel_pos
+
         # Convert numpy arrays to PIL images, then to Base64 for response
+        # Use channel position as key (Red Channel, Green Channel, etc.)
         channels_base64 = {}
         for channel_name, channel_array in unpacked.items():
             # channel_array is a numpy array, convert to PIL Image
@@ -192,7 +198,9 @@ def unpack() -> tuple:
             else:
                 channel_img = channel_array
 
-            channels_base64[channel_name] = image_to_base64(channel_img)
+            # Use channel position (R, G, B, A) as key for clearer labeling
+            channel_pos = position_map.get(channel_name, channel_name)
+            channels_base64[channel_pos] = image_to_base64(channel_img)
 
         return jsonify({"channels": channels_base64}), 200
 
