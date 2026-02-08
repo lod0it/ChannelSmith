@@ -20,6 +20,7 @@ from typing import Optional
 
 from PIL import Image, ImageTk
 
+from channelsmith.gui.drag_drop import enable_drag_drop
 from channelsmith.utils.image_utils import load_image, ImageLoadError
 
 logger = logging.getLogger(__name__)
@@ -80,6 +81,9 @@ class ImageSelector(tk.Frame):
             self, text="Preview", command=self._on_preview, width=10
         )
         preview_btn.pack(side="left", padx=5, pady=5)
+
+        # Enable drag-drop on the path label for convenient file loading
+        enable_drag_drop(self._path_label, self._load_image)
 
         logger.info("ImageSelector initialized for channel: %s", channel_name)
 

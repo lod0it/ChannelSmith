@@ -32,6 +32,33 @@ logger = logging.getLogger(__name__)
 PACKAGE_ROOT = Path(__file__).parent.parent
 DEFAULT_TEMPLATE_PATH = str(PACKAGE_ROOT / "templates" / "orm.json")
 
+# Common texture name suffixes to strip
+TEMPLATE_SUFFIXES = ["_ORM", "_ORD", "_ORH", "_PBR", "_ARM", "_MRA"]
+
+
+def _extract_base_filename(file_path: str) -> str:
+    """Extract base filename without template suffix.
+
+    Examples:
+        T_fabric_ORM.png → T_fabric
+        texture_ORD.tga → texture
+        image.png → image
+
+    Args:
+        file_path: Path to the image file
+
+    Returns:
+        Base filename without extension and template suffix
+    """
+    name = Path(file_path).stem  # Remove extension
+
+    # Try to remove known template suffixes (case-insensitive)
+    for suffix in TEMPLATE_SUFFIXES:
+        if name.upper().endswith(suffix.upper()):
+            return name[: -len(suffix)]
+
+    return name
+
 
 class UnpackerPanel(tk.Frame):
     """Frame widget for unpacking individual channels from a packed texture.
@@ -57,6 +84,7 @@ class UnpackerPanel(tk.Frame):
         super().__init__(parent, borderwidth=2, relief="groove", **kwargs)
 
         self._packed_image: Optional[Image.Image] = None
+        self._packed_image_path: Optional[str] = None
         self._unpacked_channels: Dict[str, np.ndarray] = {}
         self._save_buttons: Dict[str, tk.Button] = {}
         self._button_frame: Optional[tk.Frame] = None
@@ -203,6 +231,7 @@ class UnpackerPanel(tk.Frame):
         try:
             # Load the image
             self._packed_image = load_image(file_path)
+            self._packed_image_path = file_path  # Store path for naming exports
             self._preview_panel.show_image(self._packed_image)
 
             # Unpack using current template
@@ -212,6 +241,7 @@ class UnpackerPanel(tk.Frame):
             messagebox.showerror("Load Error", f"Failed to load image: {e}")
             logger.error("Failed to load image: %s", e)
             self._packed_image = None
+            self._packed_image_path = None
             self._unpacked_channels = {}
             self._update_save_buttons()
 
@@ -251,11 +281,50 @@ class UnpackerPanel(tk.Frame):
             else:
                 btn.config(state="disabled")
 
+    def _get_channel_display_name(self, channel_type: str) -> str:
+        """Get display name for a channel type in RGB format.
+
+        Args:
+            channel_type: Channel type (e.g., 'ambient_occlusion', 'roughness')
+
+        Returns:
+            Display name (e.g., 'Red', 'Green', 'Blue')
+        """
+        # Map channel types to their RGB components
+        channel_to_rgb = {
+            "ambient_occlusion": "Red",
+            "roughness": "Green",
+            "metallic": "Blue",
+            "displacement": "Blue",
+            "alpha": "Alpha",
+        }
+        return channel_to_rgb.get(channel_type, channel_type.title())
+
+    def _get_export_filename(self, channel_type: str) -> str:
+        """Generate export filename based on base name and channel.
+
+        Examples:
+            T_fabric + Red → T_fabric_Red_Channel.png
+            image + Green → image_Green_Channel.png
+
+        Args:
+            channel_type: Channel type (e.g., 'roughness')
+
+        Returns:
+            Suggested export filename
+        """
+        base_name = "texture"
+        if self._packed_image_path:
+            base_name = _extract_base_filename(self._packed_image_path)
+
+        display_name = self._get_channel_display_name(channel_type)
+        return f"{base_name}_{display_name}_Channel.png"
+
     def _on_save_channel(self, channel: str) -> None:
         """Handle save channel button click.
 
         Args:
-            channel: Channel name (e.g., 'roughness')
+            channel: Channel type (e.g., 'roughness')
         """
         if channel not in self._unpacked_channels:
             messagebox.showwarning(
@@ -263,10 +332,12 @@ class UnpackerPanel(tk.Frame):
             )
             return
 
+        display_name = self._get_channel_display_name(channel)
+        default_name = self._get_export_filename(channel)
+
         # Ask user where to save
-        default_name = channel.replace("_", "_") + ".png"
         file_path = filedialog.asksaveasfilename(
-            title=f"Save {channel.replace('_', ' ').title()} Channel",
+            title=f"Save {display_name} Channel",
             defaultextension=".png",
             initialfile=default_name,
             filetypes=[
@@ -290,7 +361,7 @@ class UnpackerPanel(tk.Frame):
                 save_image(channel_image, file_path)
                 messagebox.showinfo(
                     "Save Successful",
-                    f"Saved {channel.replace('_', ' ').title()} to:\n{file_path}",
+                    f"Saved {display_name} Channel to:\n{file_path}",
                 )
                 logger.info("Saved channel '%s' to %s", channel, file_path)
             except Exception as e:
@@ -316,20 +387,20 @@ class UnpackerPanel(tk.Frame):
 
         try:
             saved_count = 0
-            for channel, channel_array in self._unpacked_channels.items():
+            for channel_type, channel_array in self._unpacked_channels.items():
                 try:
-                    # Create filename based on channel name
-                    filename = f"{channel}.png"
+                    # Create filename based on base name and channel
+                    filename = self._get_export_filename(channel_type)
                     file_path = f"{output_dir}/{filename}"
 
                     # Convert to PIL Image and save
                     channel_image = from_grayscale(channel_array)
                     save_image(channel_image, file_path)
 
-                    logger.info("Exported channel '%s' to %s", channel, file_path)
+                    logger.info("Exported channel '%s' to %s", channel_type, file_path)
                     saved_count += 1
                 except Exception as e:
-                    logger.error("Failed to export channel '%s': %s", channel, e)
+                    logger.error("Failed to export channel '%s': %s", channel_type, e)
 
             messagebox.showinfo(
                 "Export Complete",
