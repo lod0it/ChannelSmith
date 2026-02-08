@@ -361,6 +361,11 @@ async function handleUnpack() {
         displayUnpackedChannels(result.channels);
         showSuccess('Texture unpacked successfully!');
 
+        // Reset button state for next upload
+        const unpackButton = document.getElementById('unpack-button');
+        unpackButton.classList.remove('ready');
+        state.unpackImage = null;
+
         hideProgress();
     } catch (error) {
         showError(`Unpack failed: ${error.message}`);
@@ -415,6 +420,7 @@ function setupUnpackUploadZone() {
     const fileInput = zone.querySelector('input[type="file"]');
     const feedback = document.getElementById('unpack-upload-feedback');
     const filenameSpan = document.getElementById('unpack-filename');
+    const unpackButton = document.getElementById('unpack-button');
 
     function updateFeedback(file) {
         state.unpackImage = file;
@@ -422,6 +428,14 @@ function setupUnpackUploadZone() {
         zone.style.backgroundColor = 'rgba(13, 115, 119, 0.1)';
         filenameSpan.textContent = file.name;
         feedback.classList.remove('hidden');
+
+        // Make unpack button green and add vibration animation
+        unpackButton.classList.add('ready', 'vibrate');
+
+        // Remove vibration animation after it completes
+        setTimeout(() => {
+            unpackButton.classList.remove('vibrate');
+        }, 600);
     }
 
     // Click to upload
