@@ -738,15 +738,17 @@ function displayUnpackedChannels(channels) {
         const info = channelLabels[channelPos];
 
         const card = document.createElement('div');
-        card.className = 'preview-card clickable';
+        card.className = 'unpack-result-item';
         card.innerHTML = `
-            <div class="flex justify-between items-start mb-3">
-                <div class="preview-label">${info.label}</div>
-                <button class="btn-secondary text-xs py-1 px-2" onclick="downloadChannel('${channelPos}', '${base64Data}')">
-                    📥 Download
+            <div class="unpack-preview-container">
+                <div class="unpack-image-wrapper clickable">
+                    <div class="preview-label">${info.label}</div>
+                    <img src="${base64Data}" class="w-full rounded-lg unpack-preview-image" style="image-rendering: pixelated;" data-channel="${channelPos}" data-label="${info.label}">
+                </div>
+                <button class="btn-download-channel" onclick="downloadChannel('${channelPos}', '${base64Data}')" title="Download ${info.label}">
+                    <span>📥</span>
                 </button>
             </div>
-            <img src="${base64Data}" class="w-full rounded-lg unpack-preview-image" style="image-rendering: pixelated;" data-channel="${channelPos}" data-label="${info.label}">
         `;
 
         resultsContainer.appendChild(card);
