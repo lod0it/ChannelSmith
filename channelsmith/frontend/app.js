@@ -745,8 +745,8 @@ function displayUnpackedChannels(channels) {
                     <div class="preview-label">${info.label}</div>
                     <img src="${base64Data}" class="w-full rounded-lg unpack-preview-image" style="image-rendering: pixelated;" data-channel="${channelPos}" data-label="${info.label}">
                 </div>
-                <button class="btn-download-channel" onclick="downloadChannel('${channelPos}', '${base64Data}')" title="Download ${info.label}">
-                    <span>📥</span>
+                <button class="pill-button-download" onclick="downloadChannel('${channelPos}', '${base64Data}')" title="Download ${info.label}">
+                    Download
                 </button>
             </div>
         `;

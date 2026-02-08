@@ -904,100 +904,27 @@ canvas {
         inset 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-/* Download Channel Button - styled like btn-12 */
-.btn-download-channel,
-.btn-download-channel *,
-.btn-download-channel :after,
-.btn-download-channel :before,
-.btn-download-channel:after,
-.btn-download-channel:before {
-    border: 0 solid;
-    box-sizing: border-box;
-}
-
-.btn-download-channel {
-    -webkit-tap-highlight-color: transparent;
-    -webkit-appearance: button;
-    background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
-    background-image: none;
-    color: #fff;
-    cursor: pointer;
-    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-        Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif,
-        Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
-    font-size: 100%;
-    font-weight: 900;
-    line-height: 1.5;
-    -webkit-mask-image: -webkit-radial-gradient(#000, #fff);
-    padding: 0;
-    text-transform: uppercase;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+/* Pill-shaped Download Button - matches preview label style */
+.pill-button-download {
+    @apply text-xs font-bold uppercase text-white;
+    padding: 6px 14px;
     border-radius: 99rem;
-    border-width: 2px;
-    border-color: #ff5a1f;
-    overflow: hidden;
-    padding: 0.8rem 0.8rem;
-    position: relative;
+    white-space: nowrap;
+    border: 2px solid #ff5a1f;
+    background: #0a0a0a;
     box-shadow: 0 0 20px rgba(255, 107, 53, 0.4);
-    width: 48px;
-    height: 48px;
-    font-size: 24px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    flex-shrink: 0;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif;
 }
 
-.btn-download-channel:disabled {
-    cursor: default;
-}
-
-.btn-download-channel span {
-    mix-blend-mode: normal;
-    position: relative;
-    z-index: 2;
-}
-
-.btn-download-channel:after,
-.btn-download-channel:before {
-    background: linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0.3) 25%,
-        transparent 0,
-        transparent 50%,
-        rgba(255, 255, 255, 0.3) 0,
-        rgba(255, 255, 255, 0.3) 75%,
-        transparent 0
-    );
-    content: "";
-    inset: 0;
-    position: absolute;
-    transform: translateY(var(--progress, 100%));
-    transition: transform 0.2s ease;
-    z-index: 1;
-}
-
-.btn-download-channel:after {
-    --progress: -100%;
-    background: linear-gradient(
-        90deg,
-        transparent 0,
-        transparent 25%,
-        rgba(255, 255, 255, 0.3) 0,
-        rgba(255, 255, 255, 0.3) 50%,
-        transparent 0,
-        transparent 75%,
-        rgba(255, 255, 255, 0.3) 0
-    );
-    z-index: 0;
-}
-
-.btn-download-channel:hover:after,
-.btn-download-channel:hover:before {
-    --progress: 0;
-}
-
-.btn-download-channel:hover {
-    background: linear-gradient(135deg, #ff8c42 0%, #ffa65a 100%);
+.pill-button-download:hover {
     box-shadow: 0 0 30px rgba(255, 107, 53, 0.6);
     transform: translateY(-2px);
+}
+
+.pill-button-download:active {
+    transform: translateY(0);
 }
