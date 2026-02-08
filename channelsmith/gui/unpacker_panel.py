@@ -2,10 +2,9 @@
 Texture unpacking panel widget.
 
 UnpackerPanel is a frame widget that provides:
-- Template selector for choosing unpacking templates
-- Load button and preview panel for the input packed texture
-- Save buttons for each extracted channel (AO, Roughness, Metallic, Alpha)
-- Status display showing available channels
+- Load button and preview panel for the input packed texture (with drag-drop support)
+- Save buttons for each extracted channel (Export R/G/B/A)
+- Export All Channels button for batch export
 
 Task B6: Implement this class
 See: BETA_TASKS.md (B6)
@@ -14,13 +13,14 @@ See: BETA_TASKS.md (B6)
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import logging
-from typing import Optional, Dict, List, Tuple
+from pathlib import Path
+from typing import Optional, Dict
 
 import numpy as np
 from PIL import Image
 
-from channelsmith.gui.template_selector import TemplateSelector
 from channelsmith.gui.preview_panel import PreviewPanel
+from channelsmith.gui.drag_drop import enable_drag_drop
 from channelsmith.templates.template_loader import load_template
 from channelsmith.core import unpack_texture
 from channelsmith.core.packing_template import PackingTemplate
@@ -28,20 +28,23 @@ from channelsmith.utils.image_utils import load_image, save_image, from_grayscal
 
 logger = logging.getLogger(__name__)
 
+# Get the package root directory and construct path to default template
+PACKAGE_ROOT = Path(__file__).parent.parent
+DEFAULT_TEMPLATE_PATH = str(PACKAGE_ROOT / "templates" / "orm.json")
+
 
 class UnpackerPanel(tk.Frame):
     """Frame widget for unpacking individual channels from a packed texture.
 
-    Provides interface to load a packed texture, unpack it according to a template,
-    and save individual channels to separate files.
+    Provides interface to load a packed texture, unpack it according to ORM template,
+    and save individual channels to separate files. Supports drag-drop loading.
 
     Attributes:
-        _template_selector: TemplateSelector widget
         _preview_panel: PreviewPanel showing loaded packed image
         _unpacked_channels: Dictionary mapping channel names to numpy arrays
         _packed_image: Currently loaded packed image
-        _status_label: Label showing channel status
         _save_buttons: Dictionary mapping channel names to save buttons
+        _current_template: Currently loaded template (ORM by default)
     """
 
     def __init__(self, parent: tk.Widget, **kwargs):
@@ -58,8 +61,10 @@ class UnpackerPanel(tk.Frame):
         self._save_buttons: Dict[str, tk.Button] = {}
         self._button_frame: Optional[tk.Frame] = None
         self._current_template: Optional[PackingTemplate] = None
-        self._status_label: Optional[tk.Label] = None
+        self._preview_panel: Optional[PreviewPanel] = None
 
+        # Load default template before creating widgets (needed for button creation)
+        self._load_default_template()
         self._create_widgets()
 
         logger.info("UnpackerPanel initialized")
@@ -71,12 +76,6 @@ class UnpackerPanel(tk.Frame):
             self, text="Texture Unpacking", font=("Arial", 12, "bold")
         )
         header_label.pack(fill="x", padx=5, pady=5)
-
-        # Template selector
-        self._template_selector = TemplateSelector(self)
-        self._template_selector.pack(fill="x", padx=5, pady=5)
-        # Bind to template selection changes
-        self._template_selector._combo.bind("<<ComboboxSelected>>", self._on_template_selected)
 
         # Create middle frame for preview and save buttons
         middle_frame = tk.Frame(self)
@@ -92,9 +91,11 @@ class UnpackerPanel(tk.Frame):
         )
         load_btn.pack(fill="x", pady=5)
 
-        # Preview panel
+        # Preview panel with drag-drop support
         self._preview_panel = PreviewPanel(left_frame, label_text="Packed Image")
         self._preview_panel.pack()
+        # Enable drag-drop on preview panel
+        enable_drag_drop(self._preview_panel, self._on_image_dropped)
 
         # Right frame for save buttons
         right_frame = tk.Frame(middle_frame)
@@ -104,27 +105,27 @@ class UnpackerPanel(tk.Frame):
         self._button_frame = tk.Frame(right_frame)
         self._button_frame.pack(fill="x")
 
-        # Status label
-        self._status_label = tk.Label(
-            right_frame,
-            text="No image loaded",
-            font=("Arial", 9),
-            fg="gray",
-            wraplength=150,
-            justify="left",
-        )
-        self._status_label.pack(fill="both", expand=True, pady=10)
-
         # Initialize buttons based on default template
         self._rebuild_buttons_for_template()
 
-    def _rebuild_buttons_for_template(self) -> None:
-        """Rebuild save buttons based on the selected template's RGB/A channels."""
+    def _load_default_template(self) -> None:
+        """Load the default ORM template."""
         try:
-            # Load the template
-            template_path = self._template_selector.get_template_path()
-            template = load_template(template_path)
-            self._current_template = template
+            self._current_template = load_template(DEFAULT_TEMPLATE_PATH)
+            logger.debug("Loaded default template: %s", self._current_template.name)
+        except Exception as e:
+            logger.error("Failed to load default template: %s", e)
+            messagebox.showerror(
+                "Template Error", f"Failed to load default template: {e}"
+            )
+
+    def _rebuild_buttons_for_template(self) -> None:
+        """Rebuild save buttons based on the current template's RGB/A channels."""
+        if self._current_template is None:
+            return
+
+        try:
+            template = self._current_template
 
             # Clear existing buttons
             for btn in self._save_buttons.values():
@@ -132,7 +133,7 @@ class UnpackerPanel(tk.Frame):
             self._save_buttons.clear()
 
             # Create buttons for each RGB(A) channel in the template
-            # Store mapping: channel_key -> channel_type (e.g., "R" -> "ambient_occlusion")
+            # Store mapping: channel_type -> button (e.g., "ambient_occlusion" -> Button)
             channel_key_order = ["R", "G", "B", "A"]
             for channel_key in channel_key_order:
                 channel_map = template.channels.get(channel_key)
@@ -152,73 +153,84 @@ class UnpackerPanel(tk.Frame):
                 # Store with channel_type as key so we can find it when unpacking
                 self._save_buttons[channel_type] = btn
 
+            # Add "Export All Channels" button
+            export_all_btn = tk.Button(
+                self._button_frame,
+                text="Export All Channels",
+                command=self._on_export_all_channels,
+                width=20,
+                state="disabled",
+            )
+            export_all_btn.pack(fill="x", pady=3)
+            self._save_buttons["_export_all"] = export_all_btn
+
             logger.debug("Rebuilt save buttons for template '%s'", template.name)
 
         except Exception as e:
             logger.error("Failed to rebuild buttons for template: %s", e)
-
-    def _on_template_selected(self, event: tk.Event) -> None:
-        """Handle template selection change.
-
-        Args:
-            event: Tkinter event
-        """
-        self._rebuild_buttons_for_template()
-        # Clear previous unpacking
-        self._packed_image = None
-        self._unpacked_channels = {}
-        self._preview_panel.show_image(None)
-        self._update_save_buttons()
-        logger.debug("Template changed, cleared previous unpacking")
 
     def _on_load_packed(self) -> None:
         """Handle Load Packed Image button click."""
         file_path = filedialog.askopenfilename(
             title="Select Packed Texture Image",
             filetypes=[
+                ("All Images", "*.png *.jpg *.jpeg *.tga *.tif *.tiff"),
                 ("PNG Images", "*.png"),
                 ("JPEG Images", "*.jpg *.jpeg"),
                 ("TGA Images", "*.tga"),
                 ("TIFF Images", "*.tif *.tiff"),
-                ("All Images", "*.png *.jpg *.jpeg *.tga *.tif *.tiff"),
                 ("All Files", "*.*"),
             ],
         )
 
         if file_path:
-            try:
-                # Load the image
-                self._packed_image = load_image(file_path)
-                self._preview_panel.show_image(self._packed_image)
+            self._load_packed_image(file_path)
 
-                # Unpack using current template
-                self._on_unpack()
-                logger.info("Loaded packed image: %s", file_path)
-            except Exception as e:
-                messagebox.showerror("Load Error", f"Failed to load image: {e}")
-                logger.error("Failed to load image: %s", e)
-                self._packed_image = None
-                self._unpacked_channels = {}
-                self._update_save_buttons()
+    def _on_image_dropped(self, file_path: str) -> None:
+        """Handle drag-drop of image file.
+
+        Args:
+            file_path: Path to the dropped image file
+        """
+        self._load_packed_image(file_path)
+
+    def _load_packed_image(self, file_path: str) -> None:
+        """Load a packed image from file.
+
+        Args:
+            file_path: Path to the image file
+        """
+        try:
+            # Load the image
+            self._packed_image = load_image(file_path)
+            self._preview_panel.show_image(self._packed_image)
+
+            # Unpack using current template
+            self._on_unpack()
+            logger.info("Loaded packed image: %s", file_path)
+        except Exception as e:
+            messagebox.showerror("Load Error", f"Failed to load image: {e}")
+            logger.error("Failed to load image: %s", e)
+            self._packed_image = None
+            self._unpacked_channels = {}
+            self._update_save_buttons()
 
     def _on_unpack(self) -> None:
-        """Unpack the loaded image using the selected template."""
-        if self._packed_image is None:
+        """Unpack the loaded image using the current template."""
+        if self._packed_image is None or self._current_template is None:
             return
 
         try:
-            # Get template
-            template_path = self._template_selector.get_template_path()
-            template = load_template(template_path)
-
             # Unpack the texture
-            self._unpacked_channels = unpack_texture(self._packed_image, template)
+            self._unpacked_channels = unpack_texture(
+                self._packed_image, self._current_template
+            )
 
             # Update save buttons
             self._update_save_buttons()
             logger.info(
                 "Unpacked texture with template '%s' (%d channels)",
-                template.name,
+                self._current_template.name,
                 len(self._unpacked_channels),
             )
         except Exception as e:
@@ -229,19 +241,12 @@ class UnpackerPanel(tk.Frame):
 
     def _update_save_buttons(self) -> None:
         """Update save button states based on available channels."""
-        status_text = ""
-        if not self._unpacked_channels:
-            status_text = "No image loaded"
-        else:
-            status_text = f"Available channels:\n"
-            for channel in self._unpacked_channels:
-                status_text += f"• {channel.replace('_', ' ').title()}\n"
-
-        self._status_label.config(text=status_text)
-
         # Enable/disable save buttons based on available channels
-        for channel, btn in self._save_buttons.items():
-            if channel in self._unpacked_channels:
+        for channel_type, btn in self._save_buttons.items():
+            if channel_type == "_export_all":
+                # Enable Export All Channels button if any channels are available
+                btn.config(state="normal" if self._unpacked_channels else "disabled")
+            elif channel_type in self._unpacked_channels:
                 btn.config(state="normal")
             else:
                 btn.config(state="disabled")
@@ -291,6 +296,48 @@ class UnpackerPanel(tk.Frame):
             except Exception as e:
                 messagebox.showerror("Save Error", f"Failed to save channel: {e}")
                 logger.error("Failed to save channel '%s': %s", channel, e)
+
+    def _on_export_all_channels(self) -> None:
+        """Handle Export All Channels button click.
+
+        Exports all unpacked channels to a user-selected directory.
+        """
+        if not self._unpacked_channels:
+            messagebox.showwarning("No Channels", "No channels available to export")
+            return
+
+        # Ask user to select output directory
+        output_dir = filedialog.askdirectory(
+            title="Select Output Directory for Channel Exports"
+        )
+
+        if not output_dir:
+            return
+
+        try:
+            saved_count = 0
+            for channel, channel_array in self._unpacked_channels.items():
+                try:
+                    # Create filename based on channel name
+                    filename = f"{channel}.png"
+                    file_path = f"{output_dir}/{filename}"
+
+                    # Convert to PIL Image and save
+                    channel_image = from_grayscale(channel_array)
+                    save_image(channel_image, file_path)
+
+                    logger.info("Exported channel '%s' to %s", channel, file_path)
+                    saved_count += 1
+                except Exception as e:
+                    logger.error("Failed to export channel '%s': %s", channel, e)
+
+            messagebox.showinfo(
+                "Export Complete",
+                f"Successfully exported {saved_count} channel(s) to:\n{output_dir}",
+            )
+        except Exception as e:
+            messagebox.showerror("Export Error", f"Failed to export channels: {e}")
+            logger.error("Failed to export channels: %s", e)
 
 
 if __name__ == "__main__":

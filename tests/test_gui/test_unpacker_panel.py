@@ -85,10 +85,9 @@ class TestUnpackerPanelInitialization:
 
     def test_initialization(self, unpacker_panel):
         """Test UnpackerPanel initializes with correct widgets."""
-        assert unpacker_panel._template_selector is not None
         assert unpacker_panel._preview_panel is not None
-        assert unpacker_panel._status_label is not None
-        # Should have buttons for each non-None channel in the template
+        assert unpacker_panel._current_template is not None
+        # Should have buttons for each non-None channel in the template plus Export All
         assert len(unpacker_panel._save_buttons) > 0
 
     def test_initial_state(self, unpacker_panel):
@@ -98,12 +97,16 @@ class TestUnpackerPanelInitialization:
 
     def test_save_buttons_initial_state(self, unpacker_panel):
         """Test all save buttons are disabled initially."""
-        for btn in unpacker_panel._save_buttons.values():
-            assert btn.cget("state") == "disabled"
+        for channel_type, btn in unpacker_panel._save_buttons.items():
+            if channel_type == "_export_all":
+                assert btn.cget("state") == "disabled"
+            else:
+                assert btn.cget("state") == "disabled"
 
-    def test_status_label_initial_text(self, unpacker_panel):
-        """Test status label shows initial message."""
-        assert "No image loaded" in unpacker_panel._status_label.cget("text")
+    def test_default_template_loaded(self, unpacker_panel):
+        """Test that default ORM template is loaded."""
+        assert unpacker_panel._current_template is not None
+        assert unpacker_panel._current_template.name == "ORM"
 
 
 class TestUnpackerPanelLoading:
@@ -178,11 +181,11 @@ class TestUnpackerPanelUnpacking:
         assert "metallic" in unpacker_panel._unpacked_channels
 
     @patch("channelsmith.gui.unpacker_panel.messagebox.showerror")
-    @patch("channelsmith.gui.unpacker_panel.load_template")
-    def test_unpack_error(self, mock_load, mock_error, unpacker_panel):
+    @patch("channelsmith.gui.unpacker_panel.unpack_texture")
+    def test_unpack_error(self, mock_unpack, mock_error, unpacker_panel):
         """Test error handling when unpacking fails."""
         unpacker_panel._packed_image = Image.new("RGB", (256, 256))
-        mock_load.side_effect = FileNotFoundError("Template not found")
+        mock_unpack.side_effect = RuntimeError("Unpack failed")
 
         unpacker_panel._on_unpack()
 
@@ -262,9 +265,14 @@ class TestUnpackerPanelSaveButtons:
         assert unpacker_panel._save_buttons["ambient_occlusion"].cget("state") == "normal"
         assert unpacker_panel._save_buttons["roughness"].cget("state") == "normal"
 
-        # Check that unavailable channels (if they exist as buttons) have disabled buttons
-        for channel, btn in unpacker_panel._save_buttons.items():
-            if channel in unpacker_panel._unpacked_channels:
+        # Check that Export All Channels button is enabled when channels are available
+        assert unpacker_panel._save_buttons["_export_all"].cget("state") == "normal"
+
+        # Check that unavailable channels have disabled buttons
+        for channel_type, btn in unpacker_panel._save_buttons.items():
+            if channel_type == "_export_all":
+                continue  # Skip export all button, already checked
+            if channel_type in unpacker_panel._unpacked_channels:
                 assert btn.cget("state") == "normal"
             else:
                 assert btn.cget("state") == "disabled"
@@ -277,15 +285,22 @@ class TestUnpackerPanelSaveButtons:
         for btn in unpacker_panel._save_buttons.values():
             assert btn.cget("state") == "disabled"
 
-    def test_status_label_updated(self, unpacker_panel):
-        """Test status label is updated with channel information."""
+    def test_export_all_button_state(self, unpacker_panel):
+        """Test Export All Channels button state changes correctly."""
+        # Initially disabled
+        assert unpacker_panel._save_buttons["_export_all"].cget("state") == "disabled"
+
+        # Enabled after unpacking
         unpacker_panel._unpacked_channels = {
             "ambient_occlusion": np.ones((256, 256), dtype=np.uint8),
         }
         unpacker_panel._update_save_buttons()
+        assert unpacker_panel._save_buttons["_export_all"].cget("state") == "normal"
 
-        status_text = unpacker_panel._status_label.cget("text")
-        assert "Ambient" in status_text or "ambient" in status_text.lower()
+        # Disabled when no channels
+        unpacker_panel._unpacked_channels = {}
+        unpacker_panel._update_save_buttons()
+        assert unpacker_panel._save_buttons["_export_all"].cget("state") == "disabled"
 
 
 class TestUnpackerPanelIntegration:
@@ -421,10 +436,13 @@ class TestUnpackerPanelConstants:
         assert "ambient_occlusion" in unpacker_panel._save_buttons
         assert "roughness" in unpacker_panel._save_buttons
 
+        # Check that Export All Channels button exists
+        assert "_export_all" in unpacker_panel._save_buttons
+
         # Get the template to check which RGB channels should have buttons
         template = unpacker_panel._current_template
         expected_channel_keys = ["R", "G", "B", "A"]
-        button_count = 0
+        button_count = 1  # +1 for Export All button
 
         # Verify buttons match template structure
         for channel_key in expected_channel_keys:
