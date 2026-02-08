@@ -35,6 +35,28 @@ const CHANNEL_TYPE_LABELS = {
     'opacity': 'Opacity',
 };
 
+// Template channel mappings (hardcoded to avoid API calls)
+const TEMPLATE_CHANNELS = {
+    'Free': {
+        'R': { type: 'ambient_occlusion', label: 'Red Channel' },
+        'G': { type: 'roughness', label: 'Green Channel' },
+        'B': { type: 'metallic', label: 'Blue Channel' },
+        'A': { type: 'opacity', label: 'Alpha Channel (Optional)' },
+    },
+    'ORM': {
+        'R': { type: 'ambient_occlusion', label: 'Ambient Occlusion' },
+        'G': { type: 'roughness', label: 'Roughness' },
+        'B': { type: 'metallic', label: 'Metallic' },
+        'A': { type: 'opacity', label: 'Alpha Channel (Optional)' },
+    },
+    'ORD': {
+        'R': { type: 'ambient_occlusion', label: 'Ambient Occlusion' },
+        'G': { type: 'roughness', label: 'Roughness' },
+        'B': { type: 'displacement', label: 'Displacement' },
+        'A': { type: 'opacity', label: 'Alpha Channel (Optional)' },
+    },
+};
+
 // ============================================================================
 // API CLIENT
 // ============================================================================
@@ -358,81 +380,57 @@ function resetChannelLabelsToGeneric() {
 
 /**
  * Update pack channel labels based on the selected template.
- * For "Free" template, uses generic Red/Green/Blue/Alpha labels.
- * For other templates (ORM, ORD), shows actual channel names.
+ * Uses hardcoded template mappings (no API calls needed).
  */
 function updatePackChannelLabels(templateName) {
     console.log(`[updatePackChannelLabels] Called with template: ${templateName}`);
 
-    // For Free template, use generic labels
-    if (templateName === 'Free') {
-        console.log('[updatePackChannelLabels] Free template detected');
-        resetChannelLabelsToGeneric();
+    // Get template configuration (hardcoded)
+    const templateConfig = TEMPLATE_CHANNELS[templateName];
+    if (!templateConfig) {
+        console.error(`[updatePackChannelLabels] Unknown template: ${templateName}`);
         return;
     }
 
-    // For other templates, fetch and display semantic channel names
-    console.log(`[updatePackChannelLabels] Fetching details for ${templateName}`);
-    API.getTemplateDetails(templateName).then((templateDetails) => {
-        state.templateDetails = templateDetails;
-        console.log(`[updatePackChannelLabels] Fetched template details for ${templateName}:`, templateDetails);
+    console.log(`[updatePackChannelLabels] Using template config for ${templateName}`);
 
-        // Channel position to element ID mapping
-        const positionToElementId = {
-            'R': 'label-red',
-            'G': 'label-green',
-            'B': 'label-blue',
-            'A': 'label-alpha',
-        };
+    // Update each channel position
+    const positions = [
+        { pos: 'R', labelId: 'label-red', previewId: 'preview-label-red' },
+        { pos: 'G', labelId: 'label-green', previewId: 'preview-label-green' },
+        { pos: 'B', labelId: 'label-blue', previewId: 'preview-label-blue' },
+        { pos: 'A', labelId: 'label-alpha', previewId: 'preview-label-alpha' },
+    ];
 
-        // Channel position to preview label ID mapping
-        const positionToPreviewLabelId = {
-            'R': 'preview-label-red',
-            'G': 'preview-label-green',
-            'B': 'preview-label-blue',
-            'A': 'preview-label-alpha',
-        };
-
-        // Update labels based on template channels
-        console.log('[updatePackChannelLabels] Received template channels:', templateDetails.channels);
-
-        // Explicitly update each position
-        const positions = [
-            { pos: 'R', labelId: 'label-red', previewId: 'preview-label-red' },
-            { pos: 'G', labelId: 'label-green', previewId: 'preview-label-green' },
-            { pos: 'B', labelId: 'label-blue', previewId: 'preview-label-blue' },
-            { pos: 'A', labelId: 'label-alpha', previewId: 'preview-label-alpha' },
-        ];
-
-        for (const posItem of positions) {
-            const channelInfo = templateDetails.channels[posItem.pos];
-            if (!channelInfo) {
-                console.log(`[updatePackChannelLabels] No channel info for position ${posItem.pos}`);
-                continue;
-            }
-
-            const readableName = CHANNEL_TYPE_LABELS[channelInfo.type] || channelInfo.type;
-            console.log(`[updatePackChannelLabels] Position ${posItem.pos}: type="${channelInfo.type}" -> readableName="${readableName}"`);
-
-            const labelElement = document.getElementById(posItem.labelId);
-            if (labelElement) {
-                labelElement.innerText = readableName;
-                console.log(`[updatePackChannelLabels] ✓ Updated ${posItem.labelId} to "${readableName}"`);
-            } else {
-                console.warn(`[updatePackChannelLabels] ✗ Element ${posItem.labelId} NOT FOUND`);
-            }
-
-            const previewLabelElement = document.getElementById(posItem.previewId);
-            if (previewLabelElement) {
-                previewLabelElement.innerText = readableName;
-                console.log(`[updatePackChannelLabels] ✓ Updated ${posItem.previewId} to "${readableName}"`);
-            } else {
-                console.warn(`[updatePackChannelLabels] ✗ Element ${posItem.previewId} NOT FOUND`);
-            }
+    for (const posItem of positions) {
+        const channelInfo = templateConfig[posItem.pos];
+        if (!channelInfo) {
+            console.log(`[updatePackChannelLabels] No channel info for position ${posItem.pos}`);
+            continue;
         }
-    }).catch((error) => {
-        console.error(`Failed to update channel labels for ${templateName}:`, error);
-    });
+
+        const label = channelInfo.label;
+        console.log(`[updatePackChannelLabels] Position ${posItem.pos}: label="${label}"`);
+
+        // Update main label
+        const labelElement = document.getElementById(posItem.labelId);
+        if (labelElement) {
+            labelElement.innerText = label;
+            console.log(`[updatePackChannelLabels] ✓ Updated ${posItem.labelId} to "${label}"`);
+        } else {
+            console.warn(`[updatePackChannelLabels] ✗ Element ${posItem.labelId} NOT FOUND`);
+        }
+
+        // Update preview label (shortened version)
+        const previewLabel = label.length > 10 ? label.split(' ')[0] : label;
+        const previewLabelElement = document.getElementById(posItem.previewId);
+        if (previewLabelElement) {
+            previewLabelElement.innerText = previewLabel;
+            console.log(`[updatePackChannelLabels] ✓ Updated ${posItem.previewId} to "${previewLabel}"`);
+        } else {
+            console.warn(`[updatePackChannelLabels] ✗ Element ${posItem.previewId} NOT FOUND`);
+        }
+    }
 }
 
 // ============================================================================
