@@ -42,8 +42,10 @@ body {
 
 /* Tab Navigation */
 .tab-button {
-    @apply px-6 py-3 font-medium transition-all duration-200 border-b-2 border-transparent;
+    @apply px-5 py-2 font-medium transition-all duration-200 rounded-lg;
     color: #9ca3af;
+    border: 2px solid transparent;
+    background: rgba(75, 85, 99, 0.2);
 }
 
 .hover-vibrate-section {
@@ -51,16 +53,20 @@ body {
 }
 
 .hover-vibrate-section:hover {
-    animation: vibrateContinuous 0.5s ease-in-out infinite;
+    animation: vibrateOnce 1.6s ease-in-out 1;
 }
 
-.tab-button:hover {
-    @apply text-gray-100 border-teal-500;
+.tab-button:hover:not(.active) {
+    @apply text-gray-100;
+    border-color: #0d7377;
+    background: rgba(13, 115, 119, 0.15);
 }
 
 .tab-button.active {
-    @apply bg-gradient-to-b from-teal-600 to-teal-700 text-white border-teal-500 rounded-t-lg;
-    box-shadow: 0 2px 8px rgba(13, 115, 119, 0.3);
+    background: linear-gradient(135deg, #0d7377 0%, #14919b 100%);
+    border-color: #14919b;
+    @apply text-white;
+    box-shadow: 0 4px 12px rgba(13, 115, 119, 0.4);
 }
 
 /* Upload Zones */
@@ -78,7 +84,7 @@ body {
 .upload-zone:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(13, 115, 119, 0.2);
-    animation: vibrateContinuous 0.5s ease-in-out infinite;
+    animation: vibrateOnce 1.6s ease-in-out 1;
 }
 
 .upload-zone.dragover {
@@ -292,6 +298,19 @@ select:focus {
 
 /* Continuous looping vibration for hover */
 @keyframes vibrateContinuous {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-2px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(2px);
+    }
+}
+
+/* Vibration animation that runs exactly 2 times (0.8s cycle) */
+@keyframes vibrateOnce {
     0%, 100% {
         transform: translateX(0);
     }

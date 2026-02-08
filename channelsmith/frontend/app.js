@@ -443,6 +443,7 @@ function setupUnpackUploadZone() {
     const feedback = document.getElementById('unpack-upload-feedback');
     const filenameSpan = document.getElementById('unpack-filename');
     const unpackButton = document.getElementById('unpack-button');
+    const clearBtn = document.getElementById('unpack-clear-btn');
 
     function updateFeedback(file) {
         state.unpackImage = file;
@@ -450,6 +451,7 @@ function setupUnpackUploadZone() {
         zone.style.backgroundColor = 'rgba(13, 115, 119, 0.1)';
         filenameSpan.textContent = file.name;
         feedback.classList.remove('hidden');
+        clearBtn.classList.remove('hidden');
 
         // Make unpack button green and add vibration animation
         unpackButton.classList.add('ready', 'vibrate');
@@ -458,6 +460,16 @@ function setupUnpackUploadZone() {
         setTimeout(() => {
             unpackButton.classList.remove('vibrate');
         }, 600);
+    }
+
+    function clearUnpackUpload() {
+        state.unpackImage = null;
+        fileInput.value = '';
+        zone.style.borderColor = '';
+        zone.style.backgroundColor = '';
+        feedback.classList.add('hidden');
+        clearBtn.classList.add('hidden');
+        unpackButton.classList.remove('ready');
     }
 
     // Click to upload
@@ -494,6 +506,13 @@ function setupUnpackUploadZone() {
                 showError('Please drop an image file');
             }
         }
+    });
+
+    // Clear button handler
+    clearBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        clearUnpackUpload();
     });
 }
 
