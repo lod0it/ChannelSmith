@@ -54,7 +54,7 @@ def launch_web_ui() -> int:
         logger.info("Press Ctrl+C to stop")
 
         # Run Flask in debug mode (development)
-        app.run(host="127.0.0.1", port=5000, debug=False, use_reloader=False)
+        app.run(host="127.0.0.1", port=5000, debug=True, use_reloader=True)
 
         logger.info("ChannelSmith closed normally")
         return 0
