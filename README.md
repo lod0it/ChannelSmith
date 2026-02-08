@@ -2,9 +2,12 @@
 
 **Texture Channel Packing/Unpacking Tool for Game Development**
 
-![Status](https://img.shields.io/badge/status-alpha-orange)
+![Status](https://img.shields.io/badge/status-beta-brightgreen)
+![Version](https://img.shields.io/badge/version-0.2.0-blue)
 ![Python](https://img.shields.io/badge/python-3.8+-blue)
+![Platform](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey)
 ![License](https://img.shields.io/badge/license-proprietary-red)
+![Tests](https://img.shields.io/badge/tests-229%20passing-brightgreen)
 
 ---
 
@@ -27,6 +30,23 @@ ChannelSmith is a desktop application that allows game developers and technical 
 - ⚡ **Faster loading times** in game engines
 - 🔄 **Flexible workflows** for different engine requirements
 - 🎯 **Industry-standard templates** (ORM, ORD)
+
+---
+
+## 📥 Download & Run
+
+### Standalone Executable (Easiest)
+No Python required! Download the latest release:
+
+| Platform | Download |
+|----------|----------|
+| Windows 10+ | [ChannelSmith-Windows.zip](https://github.com/yourusername/channelsmith/releases) |
+| macOS 12+ | [ChannelSmith-macOS.zip](https://github.com/yourusername/channelsmith/releases) |
+| Linux | [ChannelSmith-Linux.tar.gz](https://github.com/yourusername/channelsmith/releases) |
+
+Extract and double-click to run. Browser opens automatically.
+
+[See full installation guide →](INSTALL.md)
 
 ---
 
@@ -60,8 +80,26 @@ ChannelSmith is a desktop application that allows game developers and technical 
 
 ChannelSmith features a modern **web-based interface** with Flask backend and Tailwind CSS styling!
 
+#### Windows
+Double-click `launch_web_ui.bat` or run:
 ```bash
 python -m channelsmith
+```
+
+#### macOS / Linux
+Make scripts executable (first time only):
+```bash
+chmod +x launch_web_ui.sh launch_simple.sh install.sh
+```
+
+Then run the launcher:
+```bash
+./launch_web_ui.sh
+```
+
+Or for setup first time:
+```bash
+./install.sh
 ```
 
 The browser opens automatically at **http://localhost:5000**
@@ -146,15 +184,19 @@ save_image(packed, "output/material_orm.png")
 
 ## 📚 Documentation
 
-### User Documentation
-- **[USER_GUIDE.md](docs/USER_GUIDE.md)** - Complete user guide with workflows and FAQs
-- **[WEB_UI_TESTING.md](WEB_UI_TESTING.md)** - Web UI testing guide & workflows
-- **[SETUP.md](SETUP.md)** - Installation and environment setup
+### Installation & Getting Started
+- **[INSTALL.md](INSTALL.md)** ⭐ **START HERE** - Complete installation guide (3 methods)
+- **[SETUP.md](SETUP.md)** - Environment setup for developers
+- **[cs_wiki.md](cs_wiki.md)** - User guide with workflows and FAQs (also in-app)
 
-### Developer Documentation
+### Testing & Development
+- **[WEB_UI_TESTING.md](WEB_UI_TESTING.md)** - Web UI testing guide
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute and code standards
 - **[CLAUDE.md](CLAUDE.md)** - Architecture and development guidelines
-- **[channelsmith/README.md](channelsmith/README.md)** - Package structure
-- **[docs/USER_GUIDE.md](docs/USER_GUIDE.md)** - Complete user guide
+
+### Release Information
+- **[CHANGELOG.md](CHANGELOG.md)** - Version history and release notes
+- **[docs/RELEASE_PROCESS.md](docs/RELEASE_PROCESS.md)** - Release workflow (maintainers)
 
 ---
 

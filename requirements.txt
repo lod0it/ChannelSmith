@@ -14,5 +14,5 @@ pytest-cov>=4.1.0       # Test coverage reporting
 black>=23.0.0           # Code formatter
 pylint>=2.17.0          # Code linter
 
-# Future Dependencies (commented out for now, will add in later phases)
-# pyinstaller>=5.13.0   # For creating .exe (RC phase)
+# PyInstaller for creating standalone executables
+pyinstaller>=5.13.0     # For creating .exe, .app, and Linux executables

@@ -17,6 +17,8 @@ import webbrowser
 from threading import Timer
 from typing import Optional
 
+from channelsmith import __version__
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -32,7 +34,7 @@ def launch_web_ui() -> int:
     Returns:
         0 on success, 1 on error
     """
-    logger.info("Starting ChannelSmith Web UI v0.1.0")
+    logger.info("Starting ChannelSmith Web UI v%s", __version__)
 
     try:
         from channelsmith.api.app import create_app
@@ -70,7 +72,7 @@ def launch_gui() -> int:
     Returns:
         0 on success, 1 on error
     """
-    logger.info("Starting ChannelSmith GUI v0.1.0 (Legacy)")
+    logger.info("Starting ChannelSmith GUI v%s (Legacy)", __version__)
 
     try:
         from channelsmith.gui.app import ChannelSmithApp
@@ -111,7 +113,7 @@ def main() -> int:
     parser.add_argument(
         "--version",
         action="version",
-        version="ChannelSmith 0.1.0",
+        version=f"ChannelSmith {__version__}",
     )
 
     args = parser.parse_args()
