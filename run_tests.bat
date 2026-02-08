@@ -51,6 +51,9 @@ if "%1"=="" (
     set choice=%1
 )
 
+REM Trim whitespace by removing quotes if present
+for /f "tokens=*" %%i in ("!choice!") do set choice=%%i
+
 if "!choice!"=="1" (
     echo Running ALL tests...
     echo.
