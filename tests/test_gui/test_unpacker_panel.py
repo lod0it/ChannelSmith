@@ -88,7 +88,8 @@ class TestUnpackerPanelInitialization:
         assert unpacker_panel._template_selector is not None
         assert unpacker_panel._preview_panel is not None
         assert unpacker_panel._status_label is not None
-        assert len(unpacker_panel._save_buttons) == 4
+        # Should have buttons for each non-None channel in the template
+        assert len(unpacker_panel._save_buttons) > 0
 
     def test_initial_state(self, unpacker_panel):
         """Test UnpackerPanel initial state."""
@@ -257,10 +258,16 @@ class TestUnpackerPanelSaveButtons:
 
         unpacker_panel._update_save_buttons()
 
+        # Check that available channels have enabled buttons
         assert unpacker_panel._save_buttons["ambient_occlusion"].cget("state") == "normal"
         assert unpacker_panel._save_buttons["roughness"].cget("state") == "normal"
-        assert unpacker_panel._save_buttons["metallic"].cget("state") == "disabled"
-        assert unpacker_panel._save_buttons["alpha"].cget("state") == "disabled"
+
+        # Check that unavailable channels (if they exist as buttons) have disabled buttons
+        for channel, btn in unpacker_panel._save_buttons.items():
+            if channel in unpacker_panel._unpacked_channels:
+                assert btn.cget("state") == "normal"
+            else:
+                assert btn.cget("state") == "disabled"
 
     def test_all_buttons_disabled_when_no_channels(self, unpacker_panel):
         """Test all save buttons are disabled when no channels."""
@@ -410,7 +417,11 @@ class TestUnpackerPanelConstants:
 
     def test_save_button_labels(self, unpacker_panel):
         """Test save buttons have correct labels."""
-        assert unpacker_panel._save_buttons["ambient_occlusion"].cget("text") == "Save Ambient Occlusion"
-        assert unpacker_panel._save_buttons["roughness"].cget("text") == "Save Roughness"
-        assert unpacker_panel._save_buttons["metallic"].cget("text") == "Save Metallic"
-        assert unpacker_panel._save_buttons["alpha"].cget("text") == "Save Alpha"
+        # Check that buttons exist for template channels
+        assert "ambient_occlusion" in unpacker_panel._save_buttons
+        assert "roughness" in unpacker_panel._save_buttons
+
+        # Verify label format: channel name is converted to title case with "Save " prefix
+        for channel, btn in unpacker_panel._save_buttons.items():
+            expected_label = f"Save {channel.replace('_', ' ').title()}"
+            assert btn.cget("text") == expected_label

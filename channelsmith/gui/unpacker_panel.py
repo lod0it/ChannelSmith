@@ -14,7 +14,7 @@ See: BETA_TASKS.md (B6)
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import logging
-from typing import Optional, Dict
+from typing import Optional, Dict, List, Tuple
 
 import numpy as np
 from PIL import Image
@@ -23,6 +23,7 @@ from channelsmith.gui.template_selector import TemplateSelector
 from channelsmith.gui.preview_panel import PreviewPanel
 from channelsmith.templates.template_loader import load_template
 from channelsmith.core import unpack_texture
+from channelsmith.core.packing_template import PackingTemplate
 from channelsmith.utils.image_utils import load_image, save_image, from_grayscale
 
 logger = logging.getLogger(__name__)
@@ -55,6 +56,9 @@ class UnpackerPanel(tk.Frame):
         self._packed_image: Optional[Image.Image] = None
         self._unpacked_channels: Dict[str, np.ndarray] = {}
         self._save_buttons: Dict[str, tk.Button] = {}
+        self._button_frame: Optional[tk.Frame] = None
+        self._current_template: Optional[PackingTemplate] = None
+        self._status_label: Optional[tk.Label] = None
 
         self._create_widgets()
 
@@ -71,6 +75,8 @@ class UnpackerPanel(tk.Frame):
         # Template selector
         self._template_selector = TemplateSelector(self)
         self._template_selector.pack(fill="x", padx=5, pady=5)
+        # Bind to template selection changes
+        self._template_selector._combo.bind("<<ComboboxSelected>>", self._on_template_selected)
 
         # Create middle frame for preview and save buttons
         middle_frame = tk.Frame(self)
@@ -94,23 +100,9 @@ class UnpackerPanel(tk.Frame):
         right_frame = tk.Frame(middle_frame)
         right_frame.pack(side="right", fill="both", padx=5)
 
-        # Channel save buttons (will be enabled/disabled based on unpacked channels)
-        button_frame = tk.Frame(right_frame)
-        button_frame.pack(fill="x")
-
-        channels = ["ambient_occlusion", "roughness", "metallic", "alpha"]
-        channel_labels = ["Ambient Occlusion", "Roughness", "Metallic", "Alpha"]
-
-        for channel, label in zip(channels, channel_labels):
-            btn = tk.Button(
-                button_frame,
-                text=f"Save {label}",
-                command=lambda ch=channel: self._on_save_channel(ch),
-                width=20,
-                state="disabled",
-            )
-            btn.pack(fill="x", pady=3)
-            self._save_buttons[channel] = btn
+        # Channel save buttons (will be created dynamically based on template)
+        self._button_frame = tk.Frame(right_frame)
+        self._button_frame.pack(fill="x")
 
         # Status label
         self._status_label = tk.Label(
@@ -122,6 +114,60 @@ class UnpackerPanel(tk.Frame):
             justify="left",
         )
         self._status_label.pack(fill="both", expand=True, pady=10)
+
+        # Initialize buttons based on default template
+        self._rebuild_buttons_for_template()
+
+    def _rebuild_buttons_for_template(self) -> None:
+        """Rebuild save buttons based on the selected template's channels."""
+        try:
+            # Load the template
+            template_path = self._template_selector.get_template_path()
+            template = load_template(template_path)
+            self._current_template = template
+
+            # Clear existing buttons
+            for btn in self._save_buttons.values():
+                btn.destroy()
+            self._save_buttons.clear()
+
+            # Create buttons for each channel in the template
+            for channel_key, channel_map in template.channels.items():
+                if channel_map is None:
+                    continue
+
+                channel_type = channel_map.map_type
+                # Format label: convert "ambient_occlusion" to "Ambient Occlusion"
+                label = channel_type.replace("_", " ").title()
+
+                btn = tk.Button(
+                    self._button_frame,
+                    text=f"Save {label}",
+                    command=lambda ch=channel_type: self._on_save_channel(ch),
+                    width=20,
+                    state="disabled",
+                )
+                btn.pack(fill="x", pady=3)
+                self._save_buttons[channel_type] = btn
+
+            logger.debug("Rebuilt save buttons for template '%s'", template.name)
+
+        except Exception as e:
+            logger.error("Failed to rebuild buttons for template: %s", e)
+
+    def _on_template_selected(self, event: tk.Event) -> None:
+        """Handle template selection change.
+
+        Args:
+            event: Tkinter event
+        """
+        self._rebuild_buttons_for_template()
+        # Clear previous unpacking
+        self._packed_image = None
+        self._unpacked_channels = {}
+        self._preview_panel.show_image(None)
+        self._update_save_buttons()
+        logger.debug("Template changed, cleared previous unpacking")
 
     def _on_load_packed(self) -> None:
         """Handle Load Packed Image button click."""
