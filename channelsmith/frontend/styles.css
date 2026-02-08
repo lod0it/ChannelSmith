@@ -51,7 +51,7 @@ body {
 }
 
 .hover-vibrate-section:hover {
-    animation: vibrateContinuous 0.3s ease-in-out infinite;
+    animation: vibrateContinuous 0.5s ease-in-out infinite;
 }
 
 .tab-button:hover {
@@ -78,6 +78,7 @@ body {
 .upload-zone:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(13, 115, 119, 0.2);
+    animation: vibrateContinuous 0.5s ease-in-out infinite;
 }
 
 .upload-zone.dragover {
