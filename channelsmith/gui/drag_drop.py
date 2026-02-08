@@ -102,19 +102,24 @@ def enable_drag_drop(
             else:
                 logger.warning("Drag-drop received unsupported file: %s", file_path)
 
-        # Register drag-drop target
-        widget.drop_target_register(DND_FILES, DND_TEXT)
-        widget.dnd_bind("<<Drop>>", drop_handler)
-        logger.info("Drag-drop enabled with tkinterdnd2")
+        try:
+            # Register drag-drop target
+            widget.drop_target_register(DND_FILES, DND_TEXT)
+            widget.dnd_bind("<<Drop>>", drop_handler)
+            logger.info("Drag-drop enabled with tkinterdnd2")
+        except Exception as e:
+            logger.debug("Failed to enable drag-drop: %s", e)
+            logger.info(
+                "Drag-drop not fully available. Some systems may require "
+                "additional setup. Install tkinterdnd2: pip install tkinterdnd2"
+            )
 
     except ImportError:
-        # Fallback: tkinterdnd not available, provide basic drag-drop via paste
+        # Fallback: tkinterdnd not available
         logger.debug(
             "tkinterdnd2 not available, drag-drop support limited. "
             "Install with: pip install tkinterdnd2"
         )
-        # Could implement fallback here (e.g., clipboard paste), but for now
-        # we just log that tkinterdnd is needed for full support
 
 
 def enable_drag_drop_on_image_selector(widget) -> None:

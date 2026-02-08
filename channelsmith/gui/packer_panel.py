@@ -21,6 +21,11 @@ from PIL import Image
 from channelsmith.gui.template_selector import TemplateSelector
 from channelsmith.gui.image_selector import ImageSelector
 from channelsmith.gui.preview_panel import PreviewPanel
+from channelsmith.gui.theme import (
+    COLORS,
+    apply_modern_frame_style,
+    create_rounded_button,
+)
 from channelsmith.templates.template_loader import load_template
 from channelsmith.core import pack_texture_from_template
 
@@ -61,6 +66,9 @@ class PackerPanel(tk.Frame):
         """
         super().__init__(parent, borderwidth=2, relief="groove", **kwargs)
 
+        # Apply modern dark theme
+        self.configure(bg=COLORS["bg_dark"], relief="flat", borderwidth=0)
+
         # Create main layout frame
         self._create_widgets()
 
@@ -69,18 +77,24 @@ class PackerPanel(tk.Frame):
     def _create_widgets(self) -> None:
         """Create and layout all widgets."""
         # Create left frame for selectors and controls
-        left_frame = tk.Frame(self)
+        left_frame = tk.Frame(self, bg=COLORS["bg_dark"], borderwidth=0)
         left_frame.pack(side="left", fill="both", expand=True, padx=5, pady=5)
+        apply_modern_frame_style(left_frame)
 
         # Header label
         header_label = tk.Label(
-            left_frame, text="Texture Packing", font=("Arial", 12, "bold")
+            left_frame,
+            text="Texture Packing",
+            font=("Segoe UI", 14, "bold"),
+            bg=COLORS["bg_dark"],
+            fg=COLORS["text_primary"],
         )
-        header_label.pack(fill="x", pady=5)
+        header_label.pack(fill="x", pady=10)
 
         # Template selector
         self._template_selector = TemplateSelector(left_frame)
         self._template_selector.pack(fill="x", pady=5)
+        apply_modern_frame_style(self._template_selector)
 
         # Image selectors for channels (using RGB naming for clarity)
         self._ao_selector = ImageSelector(left_frame, "Red Channel")
@@ -92,15 +106,16 @@ class PackerPanel(tk.Frame):
         self._metallic_selector = ImageSelector(left_frame, "Blue Channel")
         self._metallic_selector.pack(fill="x", pady=5)
 
-        # Pack button
-        self._pack_btn = tk.Button(
-            left_frame, text="Pack Texture", command=self._on_pack, height=2
+        # Pack button - use rounded button for modern look
+        self._pack_btn = create_rounded_button(
+            left_frame, text="Pack Texture", command=self._on_pack
         )
-        self._pack_btn.pack(fill="x", pady=10)
+        self._pack_btn.pack(fill="x", pady=15, ipady=8)
 
         # Create right frame for preview
-        right_frame = tk.Frame(self)
+        right_frame = tk.Frame(self, bg=COLORS["bg_dark"], borderwidth=0)
         right_frame.pack(side="right", fill="both", padx=5, pady=5)
+        apply_modern_frame_style(right_frame)
 
         # Preview panel
         self._preview_panel = PreviewPanel(right_frame, label_text="Packed Result")

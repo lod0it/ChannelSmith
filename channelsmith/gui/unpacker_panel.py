@@ -21,6 +21,12 @@ from PIL import Image
 
 from channelsmith.gui.preview_panel import PreviewPanel
 from channelsmith.gui.drag_drop import enable_drag_drop
+from channelsmith.gui.theme import (
+    COLORS,
+    apply_modern_frame_style,
+    apply_modern_button_style,
+    create_rounded_button,
+)
 from channelsmith.templates.template_loader import load_template
 from channelsmith.core import unpack_texture
 from channelsmith.core.packing_template import PackingTemplate
@@ -105,6 +111,9 @@ class UnpackerPanel(tk.Frame):
         """
         super().__init__(parent, borderwidth=2, relief="groove", **kwargs)
 
+        # Apply modern dark theme
+        self.configure(bg=COLORS["bg_dark"], relief="flat", borderwidth=0)
+
         self._packed_image: Optional[Image.Image] = None
         self._packed_image_path: Optional[str] = None
         self._unpacked_channels: Dict[str, np.ndarray] = {}
@@ -123,37 +132,45 @@ class UnpackerPanel(tk.Frame):
         """Create and layout all widgets."""
         # Header label
         header_label = tk.Label(
-            self, text="Texture Unpacking", font=("Arial", 12, "bold")
+            self,
+            text="Texture Unpacking",
+            font=("Segoe UI", 14, "bold"),
+            bg=COLORS["bg_dark"],
+            fg=COLORS["text_primary"],
         )
-        header_label.pack(fill="x", padx=5, pady=5)
+        header_label.pack(fill="x", padx=5, pady=10)
 
         # Create middle frame for preview and save buttons
-        middle_frame = tk.Frame(self)
+        middle_frame = tk.Frame(self, bg=COLORS["bg_dark"], borderwidth=0)
         middle_frame.pack(fill="both", expand=True, padx=5, pady=5)
+        apply_modern_frame_style(middle_frame)
 
         # Left frame for preview
-        left_frame = tk.Frame(middle_frame)
+        left_frame = tk.Frame(middle_frame, bg=COLORS["bg_dark"], borderwidth=0)
         left_frame.pack(side="left", fill="both", expand=True, padx=5)
+        apply_modern_frame_style(left_frame)
 
-        # Load button
-        load_btn = tk.Button(
+        # Load button with modern styling
+        load_btn = create_rounded_button(
             left_frame, text="Load Packed Image", command=self._on_load_packed
         )
-        load_btn.pack(fill="x", pady=5)
+        load_btn.pack(fill="x", pady=8, ipady=6)
 
         # Preview panel with drag-drop support
         self._preview_panel = PreviewPanel(left_frame, label_text="Packed Image")
-        self._preview_panel.pack()
+        self._preview_panel.pack(pady=5)
         # Enable drag-drop on preview panel
         enable_drag_drop(self._preview_panel, self._on_image_dropped)
 
         # Right frame for save buttons
-        right_frame = tk.Frame(middle_frame)
+        right_frame = tk.Frame(middle_frame, bg=COLORS["bg_dark"], borderwidth=0)
         right_frame.pack(side="right", fill="both", padx=5)
+        apply_modern_frame_style(right_frame)
 
         # Channel save buttons (will be created dynamically based on template)
-        self._button_frame = tk.Frame(right_frame)
+        self._button_frame = tk.Frame(right_frame, bg=COLORS["bg_dark"], borderwidth=0)
         self._button_frame.pack(fill="x")
+        apply_modern_frame_style(self._button_frame)
 
         # Initialize buttons based on default template
         self._rebuild_buttons_for_template()
@@ -192,26 +209,24 @@ class UnpackerPanel(tk.Frame):
 
                 channel_type = channel_map.map_type
 
-                btn = tk.Button(
+                btn = create_rounded_button(
                     self._button_frame,
                     text=f"Export {channel_key}",
                     command=lambda ch=channel_type: self._on_save_channel(ch),
-                    width=20,
-                    state="disabled",
                 )
-                btn.pack(fill="x", pady=3)
+                btn.pack(fill="x", pady=4, ipady=5)
+                btn.config(state="disabled")
                 # Store with channel_type as key so we can find it when unpacking
                 self._save_buttons[channel_type] = btn
 
             # Add "Export All Channels" button
-            export_all_btn = tk.Button(
+            export_all_btn = create_rounded_button(
                 self._button_frame,
                 text="Export All Channels",
                 command=self._on_export_all_channels,
-                width=20,
-                state="disabled",
             )
-            export_all_btn.pack(fill="x", pady=3)
+            export_all_btn.pack(fill="x", pady=4, ipady=5)
+            export_all_btn.config(state="disabled")
             self._save_buttons["_export_all"] = export_all_btn
 
             logger.debug("Rebuilt save buttons for template '%s'", template.name)
