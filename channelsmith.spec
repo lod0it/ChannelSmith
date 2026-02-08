@@ -19,7 +19,8 @@ import sys
 from PyInstaller.utils.hooks import collect_data_files, collect_submodules
 
 # Get absolute path to project root
-project_root = os.path.dirname(os.path.abspath(__file__))
+# Use SPECPATH (automatically set by PyInstaller) or current directory
+project_root = SPECPATH if 'SPECPATH' in dir() else os.getcwd()
 
 # Collect data files for Pillow and numpy
 pillow_data = collect_data_files('PIL')
