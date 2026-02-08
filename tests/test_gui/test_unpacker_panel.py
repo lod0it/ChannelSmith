@@ -416,12 +416,24 @@ class TestUnpackerPanelConstants:
         assert any("Packed" in child.cget("text") for child in labels)
 
     def test_save_button_labels(self, unpacker_panel):
-        """Test save buttons have correct labels."""
+        """Test save buttons have correct RGB/A labels."""
         # Check that buttons exist for template channels
         assert "ambient_occlusion" in unpacker_panel._save_buttons
         assert "roughness" in unpacker_panel._save_buttons
 
-        # Verify label format: channel name is converted to title case with "Save " prefix
-        for channel, btn in unpacker_panel._save_buttons.items():
-            expected_label = f"Save {channel.replace('_', ' ').title()}"
-            assert btn.cget("text") == expected_label
+        # Get the template to check which RGB channels should have buttons
+        template = unpacker_panel._current_template
+        expected_channel_keys = ["R", "G", "B", "A"]
+        button_count = 0
+
+        # Verify buttons match template structure
+        for channel_key in expected_channel_keys:
+            if template.channels.get(channel_key) is not None:
+                button_count += 1
+
+        assert len(unpacker_panel._save_buttons) == button_count
+
+        # Verify label format is "Export R", "Export G", "Export B", "Export A"
+        for channel_type, btn in unpacker_panel._save_buttons.items():
+            text = btn.cget("text")
+            assert text.startswith("Export ") and text[7] in "RGBA"

@@ -119,7 +119,7 @@ class UnpackerPanel(tk.Frame):
         self._rebuild_buttons_for_template()
 
     def _rebuild_buttons_for_template(self) -> None:
-        """Rebuild save buttons based on the selected template's channels."""
+        """Rebuild save buttons based on the selected template's RGB/A channels."""
         try:
             # Load the template
             template_path = self._template_selector.get_template_path()
@@ -131,23 +131,25 @@ class UnpackerPanel(tk.Frame):
                 btn.destroy()
             self._save_buttons.clear()
 
-            # Create buttons for each channel in the template
-            for channel_key, channel_map in template.channels.items():
+            # Create buttons for each RGB(A) channel in the template
+            # Store mapping: channel_key -> channel_type (e.g., "R" -> "ambient_occlusion")
+            channel_key_order = ["R", "G", "B", "A"]
+            for channel_key in channel_key_order:
+                channel_map = template.channels.get(channel_key)
                 if channel_map is None:
                     continue
 
                 channel_type = channel_map.map_type
-                # Format label: convert "ambient_occlusion" to "Ambient Occlusion"
-                label = channel_type.replace("_", " ").title()
 
                 btn = tk.Button(
                     self._button_frame,
-                    text=f"Save {label}",
+                    text=f"Export {channel_key}",
                     command=lambda ch=channel_type: self._on_save_channel(ch),
                     width=20,
                     state="disabled",
                 )
                 btn.pack(fill="x", pady=3)
+                # Store with channel_type as key so we can find it when unpacking
                 self._save_buttons[channel_type] = btn
 
             logger.debug("Rebuilt save buttons for template '%s'", template.name)
