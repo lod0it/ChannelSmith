@@ -102,10 +102,10 @@ class TestPackerPanelInitialization:
         assert isinstance(packer_panel._pack_btn, tk.Button)
 
     def test_selector_channel_names(self, packer_panel):
-        """Test image selectors have correct channel names."""
-        assert packer_panel._ao_selector._channel_name == "Ambient Occlusion"
-        assert packer_panel._roughness_selector._channel_name == "Roughness"
-        assert packer_panel._metallic_selector._channel_name == "Metallic"
+        """Test image selectors have correct RGB channel names."""
+        assert packer_panel._ao_selector._channel_name == "Red Channel"
+        assert packer_panel._roughness_selector._channel_name == "Green Channel"
+        assert packer_panel._metallic_selector._channel_name == "Blue Channel"
 
 
 class TestPackerPanelPacking:

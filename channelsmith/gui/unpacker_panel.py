@@ -32,32 +32,54 @@ logger = logging.getLogger(__name__)
 PACKAGE_ROOT = Path(__file__).parent.parent
 DEFAULT_TEMPLATE_PATH = str(PACKAGE_ROOT / "templates" / "orm.json")
 
-# Common texture name suffixes to strip
-TEMPLATE_SUFFIXES = ["_ORM", "_ORD", "_ORH", "_PBR", "_ARM", "_MRA"]
+# Common texture name patterns to remove (case-insensitive)
+# These are common suffixes used in game dev for texture naming
+TEXTURE_PATTERNS_TO_REMOVE = [
+    # Template/Packing patterns
+    "_ORM", "_ORD", "_ORH", "_PBR", "_ARM", "_MRA",
+    # Individual channel patterns
+    "_BC",  # Base Color
+    "_C",   # Color/Albedo
+    "_D",   # Diffuse
+    "_AO",  # Ambient Occlusion
+    "_ROU", "_R",  # Roughness
+    "_MET", "_M",  # Metallic
+    "_NM", "_NOR", "_NORM",  # Normal Map
+    "_disp", "_DISP", "_Height",  # Displacement/Height
+    "_dPRA",  # Disney PBR Alpha
+    "_Emissive", "_Emis",  # Emissive
+]
 
 
 def _extract_base_filename(file_path: str) -> str:
-    """Extract base filename without template suffix.
+    """Extract base filename without texture suffixes.
+
+    Removes common texture naming patterns used in game development.
 
     Examples:
         T_fabric_ORM.png → T_fabric
-        texture_ORD.tga → texture
-        image.png → image
+        Material_AO_C.png → Material_AO
+        texture_diffuse_D.tga → texture_diffuse
+        BaseColor_BC.png → BaseColor
 
     Args:
         file_path: Path to the image file
 
     Returns:
-        Base filename without extension and template suffix
+        Base filename without extension and texture suffixes
     """
     name = Path(file_path).stem  # Remove extension
 
-    # Try to remove known template suffixes (case-insensitive)
-    for suffix in TEMPLATE_SUFFIXES:
-        if name.upper().endswith(suffix.upper()):
-            return name[: -len(suffix)]
+    # Try to remove known texture patterns (case-insensitive)
+    # Sort by length descending to remove longer patterns first
+    for pattern in sorted(TEXTURE_PATTERNS_TO_REMOVE, key=len, reverse=True):
+        if name.upper().endswith(pattern.upper()):
+            name = name[: -len(pattern)]
 
-    return name
+    # Clean up trailing underscores
+    name = name.rstrip("_")
+
+    return name if name else "texture"
 
 
 class UnpackerPanel(tk.Frame):

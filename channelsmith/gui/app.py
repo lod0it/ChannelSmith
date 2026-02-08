@@ -12,6 +12,7 @@ import logging
 from typing import Optional
 
 from channelsmith.gui.main_window import MainWindow
+from channelsmith.gui.theme import configure_styles, COLORS
 
 logger = logging.getLogger(__name__)
 
@@ -35,10 +36,16 @@ class ChannelSmithApp(MainWindow):
 
         Sets up:
         - Main window and UI components (via MainWindow.__init__)
+        - Modern dark theme
         - Window close handler
         - Logging
         """
         super().__init__()
+
+        # Apply modern dark theme
+        configure_styles(self)
+        self.configure(bg=COLORS["bg_dark"])
+
         self._initialized = True
 
         # Bind the close button (X) to our cleanup handler

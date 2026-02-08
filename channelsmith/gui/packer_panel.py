@@ -3,7 +3,7 @@ Texture packing panel widget.
 
 PackerPanel is a frame widget that provides:
 - Template selector for choosing packing templates
-- Three image selectors for Ambient Occlusion, Roughness, and Metallic channels
+- Three image selectors for R/G/B channels with drag-drop support
 - Preview panel showing the packed texture result
 - Pack button to execute the packing operation
 
@@ -25,6 +25,15 @@ from channelsmith.templates.template_loader import load_template
 from channelsmith.core import pack_texture_from_template
 
 logger = logging.getLogger(__name__)
+
+# Channel display names mapping
+CHANNEL_DISPLAY_NAMES = {
+    "ambient_occlusion": "Red Channel",
+    "roughness": "Green Channel",
+    "metallic": "Blue Channel",
+    "displacement": "Blue Channel",
+    "alpha": "Alpha Channel",
+}
 
 
 class PackerPanel(tk.Frame):
@@ -73,14 +82,14 @@ class PackerPanel(tk.Frame):
         self._template_selector = TemplateSelector(left_frame)
         self._template_selector.pack(fill="x", pady=5)
 
-        # Image selectors for channels
-        self._ao_selector = ImageSelector(left_frame, "Ambient Occlusion")
+        # Image selectors for channels (using RGB naming for clarity)
+        self._ao_selector = ImageSelector(left_frame, "Red Channel")
         self._ao_selector.pack(fill="x", pady=5)
 
-        self._roughness_selector = ImageSelector(left_frame, "Roughness")
+        self._roughness_selector = ImageSelector(left_frame, "Green Channel")
         self._roughness_selector.pack(fill="x", pady=5)
 
-        self._metallic_selector = ImageSelector(left_frame, "Metallic")
+        self._metallic_selector = ImageSelector(left_frame, "Blue Channel")
         self._metallic_selector.pack(fill="x", pady=5)
 
         # Pack button
