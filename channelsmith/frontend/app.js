@@ -949,4 +949,14 @@ function initApp() {
 }
 
 // Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', initApp);
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('[DOMContentLoaded] Event fired - initializing app');
+    initApp();
+
+    // Expose update function to window for manual testing
+    window.testUpdateLabels = function(templateName) {
+        console.log(`[testUpdateLabels] Manually testing with: ${templateName}`);
+        updatePackChannelLabels(templateName);
+    };
+    console.log('[DOMContentLoaded] Exposed testUpdateLabels to window.testUpdateLabels()');
+});
