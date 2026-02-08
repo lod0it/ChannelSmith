@@ -335,26 +335,25 @@ function switchTab(tabName) {
 function resetChannelLabelsToGeneric() {
     console.log('[resetChannelLabelsToGeneric] Resetting channel labels to generic names');
 
-    const labels = {
-        'label-red': 'Red Channel',
-        'label-green': 'Green Channel',
-        'label-blue': 'Blue Channel',
-        'label-alpha': 'Alpha Channel (Optional)',
-        'preview-label-red': 'Red',
-        'preview-label-green': 'Green',
-        'preview-label-blue': 'Blue',
-        'preview-label-alpha': 'Alpha',
-    };
+    const labelEl = document.getElementById('label-red');
+    const labelEl2 = document.getElementById('label-green');
+    const labelEl3 = document.getElementById('label-blue');
+    const labelEl4 = document.getElementById('label-alpha');
 
-    for (const [elementId, text] of Object.entries(labels)) {
-        const element = document.getElementById(elementId);
-        if (element) {
-            element.textContent = text;
-            console.log(`[resetChannelLabelsToGeneric] Reset ${elementId} to "${text}"`);
-        } else {
-            console.warn(`[resetChannelLabelsToGeneric] Element with id "${elementId}" not found`);
-        }
-    }
+    if (labelEl) { labelEl.innerText = 'Red Channel'; console.log('Updated label-red'); }
+    if (labelEl2) { labelEl2.innerText = 'Green Channel'; console.log('Updated label-green'); }
+    if (labelEl3) { labelEl3.innerText = 'Blue Channel'; console.log('Updated label-blue'); }
+    if (labelEl4) { labelEl4.innerText = 'Alpha Channel (Optional)'; console.log('Updated label-alpha'); }
+
+    const previewEl1 = document.getElementById('preview-label-red');
+    const previewEl2 = document.getElementById('preview-label-green');
+    const previewEl3 = document.getElementById('preview-label-blue');
+    const previewEl4 = document.getElementById('preview-label-alpha');
+
+    if (previewEl1) { previewEl1.innerText = 'Red'; console.log('Updated preview-label-red'); }
+    if (previewEl2) { previewEl2.innerText = 'Green'; console.log('Updated preview-label-green'); }
+    if (previewEl3) { previewEl3.innerText = 'Blue'; console.log('Updated preview-label-blue'); }
+    if (previewEl4) { previewEl4.innerText = 'Alpha'; console.log('Updated preview-label-alpha'); }
 }
 
 /**
@@ -395,34 +394,40 @@ function updatePackChannelLabels(templateName) {
         };
 
         // Update labels based on template channels
-        console.log('[updatePackChannelLabels] Starting to update labels for positions R, G, B, A');
-        for (const position of ['R', 'G', 'B', 'A']) {
-            const channelInfo = templateDetails.channels[position];
+        console.log('[updatePackChannelLabels] Received template channels:', templateDetails.channels);
+
+        // Explicitly update each position
+        const positions = [
+            { pos: 'R', labelId: 'label-red', previewId: 'preview-label-red' },
+            { pos: 'G', labelId: 'label-green', previewId: 'preview-label-green' },
+            { pos: 'B', labelId: 'label-blue', previewId: 'preview-label-blue' },
+            { pos: 'A', labelId: 'label-alpha', previewId: 'preview-label-alpha' },
+        ];
+
+        for (const posItem of positions) {
+            const channelInfo = templateDetails.channels[posItem.pos];
             if (!channelInfo) {
-                console.log(`[updatePackChannelLabels] No channel info for position ${position}`);
+                console.log(`[updatePackChannelLabels] No channel info for position ${posItem.pos}`);
                 continue;
             }
 
-            const elementId = positionToElementId[position];
-            const previewLabelId = positionToPreviewLabelId[position];
             const readableName = CHANNEL_TYPE_LABELS[channelInfo.type] || channelInfo.type;
+            console.log(`[updatePackChannelLabels] Position ${posItem.pos}: type="${channelInfo.type}" -> readableName="${readableName}"`);
 
-            console.log(`[updatePackChannelLabels] Position ${position}: type="${channelInfo.type}" -> readableName="${readableName}"`);
-
-            const labelElement = document.getElementById(elementId);
+            const labelElement = document.getElementById(posItem.labelId);
             if (labelElement) {
-                labelElement.textContent = readableName;
-                console.log(`[updatePackChannelLabels] Updated ${elementId} to "${readableName}"`);
+                labelElement.innerText = readableName;
+                console.log(`[updatePackChannelLabels] ✓ Updated ${posItem.labelId} to "${readableName}"`);
             } else {
-                console.warn(`[updatePackChannelLabels] Element with id "${elementId}" not found`);
+                console.warn(`[updatePackChannelLabels] ✗ Element ${posItem.labelId} NOT FOUND`);
             }
 
-            const previewLabelElement = document.getElementById(previewLabelId);
+            const previewLabelElement = document.getElementById(posItem.previewId);
             if (previewLabelElement) {
-                previewLabelElement.textContent = readableName;
-                console.log(`[updatePackChannelLabels] Updated ${previewLabelId} to "${readableName}"`);
+                previewLabelElement.innerText = readableName;
+                console.log(`[updatePackChannelLabels] ✓ Updated ${posItem.previewId} to "${readableName}"`);
             } else {
-                console.warn(`[updatePackChannelLabels] Element with id "${previewLabelId}" not found`);
+                console.warn(`[updatePackChannelLabels] ✗ Element ${posItem.previewId} NOT FOUND`);
             }
         }
     }).catch((error) => {
