@@ -105,8 +105,8 @@ class PackerPanel(tk.Frame):
         """
         try:
             # Get template
-            template_name = self._template_selector.get_selected_template()
-            template = load_template(template_name)
+            template_path = self._template_selector.get_template_path()
+            template = load_template(template_path)
 
             # Get images from selectors
             ao_img = self._ao_selector.get_image()

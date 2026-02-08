@@ -160,8 +160,8 @@ class UnpackerPanel(tk.Frame):
 
         try:
             # Get template
-            template_name = self._template_selector.get_selected_template()
-            template = load_template(template_name)
+            template_path = self._template_selector.get_template_path()
+            template = load_template(template_path)
 
             # Unpack the texture
             self._unpacked_channels = unpack_texture(self._packed_image, template)

@@ -17,6 +17,9 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
+# Get the package root directory
+PACKAGE_ROOT = Path(__file__).parent.parent
+
 # Built-in templates
 BUILTIN_TEMPLATES = ["ORM", "ORD"]
 
@@ -92,6 +95,22 @@ class TemplateSelector(tk.Frame):
         Returns:
             Template name (e.g., 'ORM') or file path for custom templates
         """
+        return self._selected_template
+
+    def get_template_path(self) -> str:
+        """Get the full file path for the selected template.
+
+        Converts builtin template names to their file paths, or returns
+        the custom template path as-is.
+
+        Returns:
+            Full file path to the template JSON file
+        """
+        if self._selected_template in BUILTIN_TEMPLATES:
+            # Convert builtin name to absolute file path
+            # (e.g., "ORM" -> "/path/to/channelsmith/templates/orm.json")
+            template_name = self._selected_template.lower()
+            return str(PACKAGE_ROOT / "templates" / f"{template_name}.json")
         return self._selected_template
 
 
