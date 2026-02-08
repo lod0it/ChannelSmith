@@ -69,6 +69,47 @@ def get_templates() -> tuple:
         return jsonify({"error": str(e)}), 500
 
 
+@api_bp.route("/templates/<name>", methods=["GET"])
+def get_template_details(name: str) -> tuple:
+    """
+    Get detailed information about a specific template.
+
+    Args:
+        name: Template name (e.g., "ORM", "ORD", "Free")
+
+    Returns:
+        JSON response with template details including channel information
+    """
+    try:
+        template_path = get_template_path(name)
+        if not template_path.exists():
+            return jsonify({"error": f"Template not found: {name}"}), 404
+
+        template = load_template(str(template_path))
+        channels_info = {}
+
+        # Build channel information from template
+        for channel_pos, channel_map in template.get_used_channels().items():
+            channels_info[channel_pos] = {
+                "type": channel_map.map_type,
+                "default": channel_map.default_value,
+            }
+
+        return (
+            jsonify(
+                {
+                    "name": template.name,
+                    "description": template.description,
+                    "channels": channels_info,
+                }
+            ),
+            200,
+        )
+    except Exception as e:
+        logger.exception("Error getting template details: %s", e)
+        return jsonify({"error": str(e)}), 500
+
+
 @api_bp.route("/pack", methods=["POST"])
 def pack() -> tuple:
     """

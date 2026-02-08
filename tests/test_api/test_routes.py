@@ -97,6 +97,42 @@ class TestTemplatesEndpoint:
         data = json.loads(response.data)
         assert "ORD" in data["templates"]
 
+    def test_get_template_details_orm(self, client):
+        """Get template details should return ORM template information."""
+        response = client.get("/api/templates/ORM")
+        assert response.status_code == 200
+
+        data = json.loads(response.data)
+        assert data["name"] == "ORM"
+        assert "description" in data
+        assert "channels" in data
+        assert "R" in data["channels"]
+        assert "G" in data["channels"]
+        assert "B" in data["channels"]
+
+    def test_get_template_details_ord(self, client):
+        """Get template details should return ORD template information."""
+        response = client.get("/api/templates/ORD")
+        assert response.status_code == 200
+
+        data = json.loads(response.data)
+        assert data["name"] == "ORD"
+        assert "channels" in data
+
+    def test_get_template_details_free(self, client):
+        """Get template details should return Free template information."""
+        response = client.get("/api/templates/Free")
+        assert response.status_code == 200
+
+        data = json.loads(response.data)
+        assert data["name"] == "Free"
+        assert "channels" in data
+
+    def test_get_template_details_invalid(self, client):
+        """Get template details should fail for invalid template."""
+        response = client.get("/api/templates/INVALID")
+        assert response.status_code == 404
+
 
 class TestPackEndpoint:
     """Tests for the /api/pack endpoint."""

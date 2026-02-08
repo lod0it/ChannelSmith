@@ -22,6 +22,17 @@ const state = {
     unpackImage: null,
     packedResult: null,
     unpackedChannels: {},
+    docsLoaded: false,
+    templateDetails: {},
+};
+
+// Channel type to human-readable label mapping
+const CHANNEL_TYPE_LABELS = {
+    'ambient_occlusion': 'Ambient Occlusion',
+    'roughness': 'Roughness',
+    'metallic': 'Metallic',
+    'displacement': 'Displacement',
+    'opacity': 'Opacity',
 };
 
 // ============================================================================
@@ -88,6 +99,15 @@ const API = {
     },
 
     /**
+     * Get detailed information about a specific template.
+     */
+    async getTemplateDetails(templateName) {
+        const response = await fetch(`${this.baseURL}/templates/${templateName}`);
+        if (!response.ok) throw new Error(`Failed to fetch template details for ${templateName}`);
+        return await response.json();
+    },
+
+    /**
      * Health check.
      */
     async health() {
@@ -124,6 +144,177 @@ function showSuccess(message) {
     setTimeout(() => container.classList.add('hidden'), 3000);
 }
 
+// ============================================================================
+// ZOOM PREVIEW
+// ============================================================================
+
+function openZoom(imageElement, label) {
+    const modal = document.getElementById('zoom-modal');
+    const zoomImage = document.getElementById('zoom-image');
+    const zoomLabel = document.getElementById('zoom-label');
+
+    if (imageElement.tagName === 'CANVAS') {
+        // Convert canvas to image
+        zoomImage.src = imageElement.toDataURL('image/png');
+    } else if (imageElement.tagName === 'IMG') {
+        zoomImage.src = imageElement.src;
+    }
+
+    zoomLabel.textContent = label || 'Preview';
+    modal.classList.add('active');
+}
+
+function closeZoom(event) {
+    // Allow closing by clicking outside or on close button
+    const modal = document.getElementById('zoom-modal');
+    modal.classList.remove('active');
+}
+
+// ============================================================================
+// DOCUMENTATION LOADING
+// ============================================================================
+
+/**
+ * Simple markdown to HTML converter for documentation display.
+ * Handles headings, emphasis, links, lists, code blocks, and tables.
+ */
+function markdownToHtml(markdown) {
+    let html = markdown;
+
+    // Escape HTML
+    html = html
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+
+    // Code blocks (triple backticks)
+    html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (match, lang, code) => {
+        return `<pre class="bg-[#0a0a0a] border border-[#2a2a2a] rounded p-4 overflow-x-auto my-4"><code class="text-gray-300 text-sm">${code.trim()}</code></pre>`;
+    });
+
+    // Inline code
+    html = html.replace(/`([^`]+)`/g, '<code class="bg-[#0a0a0a] px-2 py-1 rounded text-[#ff8c42] text-sm">$1</code>');
+
+    // Headers
+    html = html.replace(/^### (.*?)$/gm, '<h3 class="text-xl font-bold mt-6 mb-3 text-[#ff6b35]">$1</h3>');
+    html = html.replace(/^## (.*?)$/gm, '<h2 class="text-2xl font-bold mt-8 mb-4 text-[#ff6b35]">$1</h2>');
+    html = html.replace(/^# (.*?)$/gm, '<h1 class="text-3xl font-bold mt-10 mb-5 text-[#ff6b35]">$1</h1>');
+
+    // Horizontal rules
+    html = html.replace(/^---$/gm, '<hr class="my-6 border-[#2a2a2a]">');
+
+    // Bold
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold">$1</strong>');
+
+    // Italic
+    html = html.replace(/\*(.*?)\*/g, '<em class="italic">$1</em>');
+
+    // Links
+    html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-[#ff8c42] hover:text-[#ffa65a] underline" target="_blank">$1</a>');
+
+    // Lists - unordered
+    html = html.replace(/^\s*[-*+] (.*?)$/gm, '<li class="ml-6">$1</li>');
+    html = html.replace(/(<li class="ml-6">.*?<\/li>)/s, (match) => {
+        return '<ul class="list-disc my-3">' + match + '</ul>';
+    });
+
+    // Lists - ordered
+    html = html.replace(/^\s*(\d+)\. (.*?)$/gm, '<li class="ml-6">$2</li>');
+    html = html.replace(/(<li class="ml-6">[0-9].*?<\/li>)/s, (match) => {
+        return '<ol class="list-decimal my-3">' + match + '</ol>';
+    });
+
+    // Tables
+    html = html.replace(
+        /\| (.*?) \|\n\| *[-:| ]+? *\|\n((?:\| .*? \|\n?)*)/g,
+        (match, headers, rows) => {
+            const headerCells = headers.split('|').map(h => h.trim()).filter(h => h);
+            const rowsArray = rows.split('\n').filter(r => r.trim());
+
+            let table = '<table class="w-full my-4 border-collapse"><thead>';
+            table += '<tr class="border-b border-[#2a2a2a]">';
+            headerCells.forEach(h => {
+                table += `<th class="text-left px-4 py-2 font-bold text-[#ff8c42]">${h}</th>`;
+            });
+            table += '</tr></thead><tbody>';
+
+            rowsArray.forEach(row => {
+                const cells = row.split('|').map(c => c.trim()).filter(c => c);
+                if (cells.length === headerCells.length) {
+                    table += '<tr class="border-b border-[#2a2a2a]">';
+                    cells.forEach(cell => {
+                        table += `<td class="px-4 py-2 text-gray-300">${cell}</td>`;
+                    });
+                    table += '</tr>';
+                }
+            });
+
+            table += '</tbody></table>';
+            return table;
+        }
+    );
+
+    // Paragraphs
+    html = html.replace(/\n\n+/g, '</p><p class="my-4 leading-relaxed text-gray-300">');
+    html = '<p class="my-4 leading-relaxed text-gray-300">' + html + '</p>';
+
+    // Line breaks
+    html = html.replace(/\n(?!<)/g, '<br>');
+
+    // Clean up double tags
+    html = html.replace(/<\/p><p class="my-4 leading-relaxed text-gray-300"><\/p>/g, '</p><p class="my-4 leading-relaxed text-gray-300">');
+    html = html.replace(/<p class="my-4 leading-relaxed text-gray-300"><\/p>/g, '');
+
+    return html;
+}
+
+/**
+ * Load and display the documentation from cs_wiki.md
+ */
+async function loadDocumentation() {
+    const contentContainer = document.getElementById('info-content');
+
+    try {
+        // Fetch documentation from the Flask route
+        console.log('Loading documentation...');
+        const response = await fetch('/cs_wiki.md', {
+            method: 'GET',
+            headers: {
+                'Accept': 'text/markdown, text/plain, */*',
+            },
+            cache: 'no-cache',
+        });
+
+        console.log(`Fetch response status: ${response.status}`);
+
+        if (!response.ok) {
+            console.log(`Failed to load documentation. Status: ${response.status} ${response.statusText}`);
+            console.log('Response headers:', response.headers);
+            const text = await response.text();
+            console.log('Response body:', text);
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const markdown = await response.text();
+        const htmlContent = markdownToHtml(markdown);
+
+        contentContainer.innerHTML = htmlContent;
+
+        // Scroll to top
+        contentContainer.scrollTop = 0;
+    } catch (error) {
+        console.error('Failed to load documentation:', error);
+        contentContainer.innerHTML = `
+            <div class="text-center py-12 text-red-400">
+                <p>⚠️ Error loading documentation</p>
+                <p class="text-sm text-gray-500 mt-2">${error.message}</p>
+            </div>
+        `;
+    }
+}
+
 function switchTab(tabName) {
     state.currentTab = tabName;
 
@@ -136,6 +327,52 @@ function switchTab(tabName) {
     document.querySelectorAll('.panel-section').forEach(panel => {
         panel.classList.toggle('active', panel.id === `${tabName}-panel`);
     });
+}
+
+/**
+ * Update pack channel labels based on the selected template.
+ * Fetches template details and updates the UI labels to show the actual channel names.
+ */
+async function updatePackChannelLabels(templateName) {
+    try {
+        const templateDetails = await API.getTemplateDetails(templateName);
+        state.templateDetails = templateDetails;
+
+        // Channel position to element ID mapping
+        const positionToElementId = {
+            'R': 'label-red',
+            'G': 'label-green',
+            'B': 'label-blue',
+            'A': 'label-alpha',
+        };
+
+        // Channel position to preview label ID mapping
+        const positionToPreviewLabelId = {
+            'R': 'preview-label-red',
+            'G': 'preview-label-green',
+            'B': 'preview-label-blue',
+            'A': 'preview-label-alpha',
+        };
+
+        // Update labels based on template channels
+        for (const [position, channelInfo] of Object.entries(templateDetails.channels)) {
+            const elementId = positionToElementId[position];
+            const previewLabelId = positionToPreviewLabelId[position];
+            const readableName = CHANNEL_TYPE_LABELS[channelInfo.type] || channelInfo.type;
+
+            const labelElement = document.getElementById(elementId);
+            if (labelElement) {
+                labelElement.textContent = readableName;
+            }
+
+            const previewLabelElement = document.getElementById(previewLabelId);
+            if (previewLabelElement) {
+                previewLabelElement.textContent = readableName;
+            }
+        }
+    } catch (error) {
+        console.error('Failed to update channel labels:', error);
+    }
 }
 
 // ============================================================================
@@ -213,6 +450,15 @@ function handleFileSelected(channel, file, zoneElement) {
     const previewCanvas = document.getElementById(previewId);
     if (previewCanvas) {
         displayImagePreview(file, previewCanvas);
+
+        // Make preview clickable when image is uploaded
+        const card = previewCanvas.closest('.preview-card');
+        if (card && !card.classList.contains('clickable')) {
+            card.classList.add('clickable');
+            previewCanvas.addEventListener('click', () => {
+                openZoom(previewCanvas, channel.split('_')[0].charAt(0).toUpperCase() + channel.split('_')[0].slice(1));
+            });
+        }
     }
 
     // Update pack button ready state if at least one channel is selected
@@ -275,13 +521,19 @@ function clearChannelUpload(channel) {
             clearBtn.classList.add('hidden');
         }
 
-        // Clear preview canvas
+        // Clear preview canvas and remove clickable class
         const previewId = `preview-${channel.split('_')[0]}`;
         const previewCanvas = document.getElementById(previewId);
         if (previewCanvas) {
             const ctx = previewCanvas.getContext('2d');
             ctx.fillStyle = '#0a0a0a';
             ctx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
+
+            // Remove clickable class when image is cleared
+            const card = previewCanvas.closest('.preview-card');
+            if (card) {
+                card.classList.remove('clickable');
+            }
         }
     }
 
@@ -350,6 +602,18 @@ function displayPackedResult(blob) {
     // Show result section
     resultSection.classList.remove('hidden');
 
+    // Make result image clickable and add zoom handler
+    const card = resultImage.closest('.preview-card');
+    if (card && !card.classList.contains('clickable')) {
+        card.classList.add('clickable');
+        if (!resultImage.hasClickHandler) {
+            resultImage.addEventListener('click', () => {
+                openZoom(resultImage, 'Packed Result');
+            });
+            resultImage.hasClickHandler = true;
+        }
+    }
+
     // Setup download button
     document.getElementById('download-packed').onclick = () => {
         const link = document.createElement('a');
@@ -407,11 +671,16 @@ function displayUnpackedChannels(channels) {
         A: { label: 'Alpha Channel', color: 'bg-gray-600' },
     };
 
-    for (const [channelPos, base64Data] of Object.entries(channels)) {
-        const info = channelLabels[channelPos] || { label: channelPos, color: 'bg-gray-600' };
+    // Display channels in order: R, G, B, A
+    const channelOrder = ['R', 'G', 'B', 'A'];
+    for (const channelPos of channelOrder) {
+        if (!(channelPos in channels)) continue;
+
+        const base64Data = channels[channelPos];
+        const info = channelLabels[channelPos];
 
         const card = document.createElement('div');
-        card.className = 'preview-card';
+        card.className = 'preview-card clickable';
         card.innerHTML = `
             <div class="flex justify-between items-start mb-3">
                 <div class="preview-label">${info.label}</div>
@@ -419,10 +688,16 @@ function displayUnpackedChannels(channels) {
                     📥 Download
                 </button>
             </div>
-            <img src="${base64Data}" class="w-full rounded-lg" style="image-rendering: pixelated;">
+            <img src="${base64Data}" class="w-full rounded-lg unpack-preview-image" style="image-rendering: pixelated;" data-channel="${channelPos}" data-label="${info.label}">
         `;
 
         resultsContainer.appendChild(card);
+
+        // Add click handler for zoom
+        const img = card.querySelector('img');
+        img.addEventListener('click', () => {
+            openZoom(img, info.label);
+        });
     }
 }
 
@@ -517,20 +792,32 @@ function setupUnpackUploadZone() {
 }
 
 function initApp() {
-    // Setup tab switching
-    document.querySelectorAll('.tab-button').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (btn.dataset.tab) {
-                switchTab(btn.dataset.tab);
-            }
+    // Setup mode toggle (Pack/Unpack switch)
+    const modeToggle = document.getElementById('mode-toggle');
+    if (modeToggle) {
+        modeToggle.addEventListener('change', () => {
+            switchTab(modeToggle.checked ? 'unpack' : 'pack');
         });
-    });
+    }
 
     // Setup Info button
     const infoButton = document.getElementById('info-button');
     if (infoButton) {
         infoButton.addEventListener('click', () => {
-            window.open('https://github.com/cgCrate/ChannelSmith', '_blank');
+            switchTab('info');
+            if (!state.docsLoaded) {
+                loadDocumentation();
+                state.docsLoaded = true;
+            }
+        });
+    }
+
+    // Setup Info Close button
+    const infoCloseBtn = document.getElementById('info-close-btn');
+    if (infoCloseBtn) {
+        infoCloseBtn.addEventListener('click', () => {
+            switchTab('pack');
+            modeToggle.checked = false;
         });
     }
 
@@ -561,10 +848,16 @@ function initApp() {
     // Initialize tab visibility
     switchTab('pack');
 
-    // Set default template to 'Free'
+    // Set default template to 'Free' and add change listener
     const packTemplateSelect = document.getElementById('pack-template');
     if (packTemplateSelect) {
         packTemplateSelect.value = 'Free';
+        // Update labels when template changes
+        packTemplateSelect.addEventListener('change', (e) => {
+            updatePackChannelLabels(e.target.value);
+        });
+        // Initial label update for default template
+        updatePackChannelLabels('Free');
     }
 
     // Load available templates
