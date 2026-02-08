@@ -21,12 +21,12 @@
         <main class="flex-1 p-6">
             <div class="max-w-6xl mx-auto">
                 <!-- Tab Navigation -->
-                <div class="flex gap-4 mb-8 items-center">
-                    <button id="tab-pack" class="keycap active hover-vibrate-section" data-tab="pack" title="Pack Texture">
-                        <aside class="letter">📦<br><span style="font-size: 12px; line-height: 1.2;">PACK</span></aside>
+                <div class="flex gap-2 mb-8 border-b border-gray-800 items-center">
+                    <button id="tab-pack" class="tab-button active hover-vibrate-section" data-tab="pack">
+                        <span class="text-lg">📦</span> Pack Texture
                     </button>
-                    <button id="tab-unpack" class="keycap hover-vibrate-section" data-tab="unpack" title="Unpack Texture">
-                        <aside class="letter">📂<br><span style="font-size: 12px; line-height: 1.2;">UNPACK</span></aside>
+                    <button id="tab-unpack" class="tab-button hover-vibrate-section" data-tab="unpack">
+                        <span class="text-lg">📂</span> Unpack Texture
                     </button>
                     <button id="info-button" class="tab-button hover-vibrate-section" title="Open documentation">
                         <span class="text-lg">ℹ️</span> Info
@@ -132,8 +132,8 @@
                             </div>
 
                             <!-- Pack Button -->
-                            <button id="pack-button" class="btn-primary w-full mt-8">
-                                Pack Texture
+                            <button id="pack-button" class="keycap mt-8" title="Pack Texture">
+                                <aside class="letter">📦<br><span style="font-size: 12px; line-height: 1;">PACK</span></aside>
                             </button>
                         </div>
 
@@ -203,8 +203,8 @@
                             </div>
 
                             <!-- Unpack Button -->
-                            <button id="unpack-button" class="btn-primary w-full">
-                                Unpack Texture
+                            <button id="unpack-button" class="keycap">
+                                <aside class="letter">📂<br><span style="font-size: 12px; line-height: 1;">UNPACK</span></aside>
                             </button>
                         </div>
 

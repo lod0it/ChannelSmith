@@ -167,6 +167,30 @@ body {
         10px 5px 10px rgba(0, 0, 0, 0.2);
 }
 
+/* Action button keycaps (Pack/Unpack) */
+#pack-button, #unpack-button {
+    margin: 8px auto;
+    display: block;
+}
+
+#pack-button.ready, #unpack-button.ready {
+    background: linear-gradient(180deg, #0d7377, #0a5a5e);
+    box-shadow:
+        inset -8px 0 8px rgba(0, 255, 136, 0.1),
+        inset 0 -8px 8px rgba(0, 255, 136, 0.15),
+        0 0 0 2px rgba(0, 255, 136, 0.5),
+        10px 20px 25px rgba(0, 255, 136, 0.3);
+}
+
+#pack-button.ready::before, #unpack-button.ready::before {
+    background: linear-gradient(90deg, #0a8d8f, #14919b);
+    border-left: 1px solid rgba(0, 255, 136, 0.4);
+    border-top: 1px solid rgba(0, 255, 136, 0.6);
+    box-shadow:
+        -10px -10px 10px rgba(0, 255, 136, 0.2),
+        10px 5px 10px rgba(0, 0, 0, 0.2);
+}
+
 /* Upload Zones */
 .upload-zone {
     @apply relative border-2 border-dashed border-gray-700 rounded-lg p-8
