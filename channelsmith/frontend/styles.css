@@ -1,0 +1,270 @@
+/* Tailwind CSS imports and custom theme */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Custom Properties */
+:root {
+    --bg-dark: #1e1e1e;
+    --bg-panel: #2d2d2d;
+    --accent: #0d7377;
+    --accent-hover: #14919b;
+    --border-color: #404040;
+}
+
+/* Base Styles */
+body {
+    background-color: #111827;
+    color: #f3f4f6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Panel Styling */
+.panel-section {
+    display: none;
+}
+
+.panel-section.active {
+    display: block;
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Tab Navigation */
+.tab-button {
+    @apply px-6 py-3 font-medium transition-all duration-200 border-b-2 border-transparent;
+    color: #9ca3af;
+}
+
+.tab-button:hover {
+    @apply text-gray-100 border-teal-500;
+}
+
+.tab-button.active {
+    @apply bg-gradient-to-b from-teal-600 to-teal-700 text-white border-teal-500 rounded-t-lg;
+    box-shadow: 0 2px 8px rgba(13, 115, 119, 0.3);
+}
+
+/* Upload Zones */
+.upload-zone {
+    @apply relative border-2 border-dashed border-gray-700 rounded-lg p-8
+           text-center cursor-pointer transition-all duration-200
+           hover:border-teal-500 hover:bg-gray-800 hover:bg-opacity-50;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.upload-zone.dragover {
+    @apply border-teal-400 bg-gray-800 bg-opacity-70;
+    box-shadow: 0 0 16px rgba(13, 115, 119, 0.4);
+}
+
+.upload-zone input[type="file"] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    opacity: 0;
+    top: 0;
+    left: 0;
+}
+
+.upload-group {
+    @apply p-4 bg-gray-800 rounded-lg transition-all duration-200;
+}
+
+.upload-group:hover {
+    @apply bg-gray-750;
+}
+
+/* Button Styles */
+.btn-primary {
+    @apply relative bg-gradient-to-br from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600
+           text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200
+           shadow-lg hover:shadow-xl hover:shadow-teal-500/20
+           focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-gray-900
+           disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+.btn-secondary {
+    @apply bg-gray-700 hover:bg-gray-600 text-white font-medium
+           py-2 px-4 rounded-lg transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-gray-500;
+}
+
+.btn-secondary:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Preview Cards */
+.preview-card {
+    @apply bg-gray-800 rounded-lg p-4 border border-gray-700 transition-all duration-200;
+}
+
+.preview-card:hover {
+    @apply border-teal-600 shadow-lg shadow-teal-500/10;
+}
+
+.preview-label {
+    @apply text-sm font-semibold text-gray-300 mb-3;
+}
+
+.preview-canvas {
+    @apply w-full aspect-square rounded-lg bg-black bg-opacity-30 border border-gray-700;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+/* Progress Bar */
+.progress-bar {
+    @apply w-full bg-gray-700 rounded-full h-2 overflow-hidden;
+}
+
+.progress-bar-fill {
+    @apply bg-gradient-to-r from-teal-500 to-teal-400 h-full transition-all duration-300 rounded-full;
+    box-shadow: 0 0 10px rgba(13, 115, 119, 0.6);
+}
+
+/* Notifications */
+#error-container {
+    animation: slideIn 0.3s ease-out;
+}
+
+#success-container {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1f2937;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}
+
+/* Input Fields */
+input[type="file"],
+select {
+    transition: all 0.2s ease;
+}
+
+select {
+    cursor: pointer;
+}
+
+select:hover {
+    border-color: #14b8a6;
+}
+
+select:focus {
+    border-color: #0d7377;
+    box-shadow: 0 0 0 3px rgba(13, 115, 119, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .tab-button {
+        @apply px-4 py-2 text-sm;
+    }
+
+    .btn-primary {
+        @apply py-2 px-4 text-sm;
+    }
+
+    .preview-canvas {
+        max-height: 200px;
+    }
+
+    #app {
+        padding: 0;
+    }
+
+    main {
+        padding: 1rem !important;
+    }
+}
+
+/* Loading Animation */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.loading {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Smooth Transitions */
+* {
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+button, input, select {
+    transition: all 0.2s ease;
+}
+
+/* Focus Styles for Accessibility */
+:focus-visible {
+    outline: 2px solid #0d7377;
+    outline-offset: 2px;
+}
+
+/* Disabled State */
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Canvas styling for checkerboard pattern background */
+canvas {
+    background: linear-gradient(45deg, #2d2d2d 25%, transparent 25%),
+                linear-gradient(-45deg, #2d2d2d 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #2d2d2d 75%),
+                linear-gradient(-45deg, transparent 75%, #2d2d2d 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    background-color: #1a1a1a;
+}

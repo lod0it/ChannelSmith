@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChannelSmith - Texture Channel Packer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-900 text-gray-100">
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="border-b border-gray-800 py-6 px-6">
+            <div class="max-w-6xl mx-auto">
+                <h1 class="text-4xl font-bold text-teal-400 mb-2">ChannelSmith</h1>
+                <p class="text-gray-400 text-lg">Professional Texture Channel Packer</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6">
+            <div class="max-w-6xl mx-auto">
+                <!-- Tab Navigation -->
+                <div class="flex gap-2 mb-8 border-b border-gray-800">
+                    <button id="tab-pack" class="tab-button active" data-tab="pack">
+                        <span class="text-lg">📦</span> Pack Channels
+                    </button>
+                    <button id="tab-unpack" class="tab-button" data-tab="unpack">
+                        <span class="text-lg">📂</span> Unpack Texture
+                    </button>
+                </div>
+
+                <!-- Pack Panel -->
+                <div id="pack-panel" class="panel-section active">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Upload Section -->
+                        <div>
+                            <h2 class="text-2xl font-bold mb-6 text-teal-400">Upload Channels</h2>
+
+                            <!-- Template Selector -->
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium mb-2 text-gray-300">
+                                    Template
+                                </label>
+                                <select id="pack-template" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-gray-100 hover:border-teal-500 focus:border-teal-500 focus:outline-none transition-colors">
+                                    <option value="ORM">ORM (Occlusion-Roughness-Metallic)</option>
+                                    <option value="ORD">ORD (Occlusion-Roughness-Displacement)</option>
+                                </select>
+                            </div>
+
+                            <!-- Channel Upload Zones -->
+                            <div id="pack-channels" class="space-y-4">
+                                <!-- Red Channel (AO) -->
+                                <div class="upload-group">
+                                    <label class="block text-sm font-medium mb-2 text-gray-300">
+                                        <span class="inline-block w-4 h-4 bg-red-600 rounded mr-2"></span>
+                                        Red Channel (Ambient Occlusion)
+                                    </label>
+                                    <div class="upload-zone" data-channel="red_channel">
+                                        <input type="file" accept="image/*" style="display: none;">
+                                        <div class="pointer-events-none">
+                                            <p class="text-gray-400 mb-2">📤 Drag image here or click to upload</p>
+                                            <p class="text-gray-500 text-sm">PNG, JPG, TGA...</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">Default: White (1.0)</p>
+                                </div>
+
+                                <!-- Green Channel (Roughness) -->
+                                <div class="upload-group">
+                                    <label class="block text-sm font-medium mb-2 text-gray-300">
+                                        <span class="inline-block w-4 h-4 bg-green-600 rounded mr-2"></span>
+                                        Green Channel (Roughness)
+                                    </label>
+                                    <div class="upload-zone" data-channel="green_channel">
+                                        <input type="file" accept="image/*" style="display: none;">
+                                        <div class="pointer-events-none">
+                                            <p class="text-gray-400 mb-2">📤 Drag image here or click to upload</p>
+                                            <p class="text-gray-500 text-sm">PNG, JPG, TGA...</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">Default: Mid-Gray (0.5)</p>
+                                </div>
+
+                                <!-- Blue Channel (Metallic) -->
+                                <div class="upload-group">
+                                    <label class="block text-sm font-medium mb-2 text-gray-300">
+                                        <span class="inline-block w-4 h-4 bg-blue-600 rounded mr-2"></span>
+                                        Blue Channel (Metallic)
+                                    </label>
+                                    <div class="upload-zone" data-channel="blue_channel">
+                                        <input type="file" accept="image/*" style="display: none;">
+                                        <div class="pointer-events-none">
+                                            <p class="text-gray-400 mb-2">📤 Drag image here or click to upload</p>
+                                            <p class="text-gray-500 text-sm">PNG, JPG, TGA...</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">Default: Black (0.0)</p>
+                                </div>
+
+                                <!-- Alpha Channel (Optional) -->
+                                <div class="upload-group">
+                                    <label class="block text-sm font-medium mb-2 text-gray-300">
+                                        <span class="inline-block w-4 h-4 bg-gray-600 rounded mr-2"></span>
+                                        Alpha Channel (Optional)
+                                    </label>
+                                    <div class="upload-zone" data-channel="alpha_channel">
+                                        <input type="file" accept="image/*" style="display: none;">
+                                        <div class="pointer-events-none">
+                                            <p class="text-gray-400 mb-2">📤 Drag image here or click to upload</p>
+                                            <p class="text-gray-500 text-sm">PNG, JPG, TGA...</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">Default: White (1.0)</p>
+                                </div>
+                            </div>
+
+                            <!-- Pack Button -->
+                            <button id="pack-button" class="btn-primary w-full mt-8">
+                                Pack Texture
+                            </button>
+                        </div>
+
+                        <!-- Preview Section -->
+                        <div>
+                            <h2 class="text-2xl font-bold mb-6 text-teal-400">Preview</h2>
+
+                            <!-- Upload Previews -->
+                            <div id="pack-previews" class="space-y-4 mb-8">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="preview-card">
+                                        <div class="preview-label">Red (AO)</div>
+                                        <canvas id="preview-red" class="preview-canvas" width="200" height="200"></canvas>
+                                    </div>
+                                    <div class="preview-card">
+                                        <div class="preview-label">Green (Roughness)</div>
+                                        <canvas id="preview-green" class="preview-canvas" width="200" height="200"></canvas>
+                                    </div>
+                                    <div class="preview-card">
+                                        <div class="preview-label">Blue (Metallic)</div>
+                                        <canvas id="preview-blue" class="preview-canvas" width="200" height="200"></canvas>
+                                    </div>
+                                    <div class="preview-card">
+                                        <div class="preview-label">Alpha</div>
+                                        <canvas id="preview-alpha" class="preview-canvas" width="200" height="200"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Result Preview -->
+                            <div id="pack-result" class="hidden">
+                                <div class="preview-card">
+                                    <div class="preview-label">Packed Result</div>
+                                    <img id="result-image" class="preview-canvas" style="image-rendering: pixelated;">
+                                </div>
+                                <button id="download-packed" class="btn-secondary w-full mt-4">
+                                    📥 Download Packed Image
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unpack Panel -->
+                <div id="unpack-panel" class="panel-section hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Upload Section -->
+                        <div>
+                            <h2 class="text-2xl font-bold mb-6 text-teal-400">Upload Packed Texture</h2>
+
+                            <!-- Template Selector -->
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium mb-2 text-gray-300">
+                                    Template
+                                </label>
+                                <select id="unpack-template" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-gray-100 hover:border-teal-500 focus:border-teal-500 focus:outline-none transition-colors">
+                                    <option value="ORM">ORM (Occlusion-Roughness-Metallic)</option>
+                                    <option value="ORD">ORD (Occlusion-Roughness-Displacement)</option>
+                                </select>
+                            </div>
+
+                            <!-- Image Upload Zone -->
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium mb-2 text-gray-300">
+                                    Packed Texture Image
+                                </label>
+                                <div id="unpack-upload" class="upload-zone">
+                                    <input type="file" accept="image/*" style="display: none;">
+                                    <div class="pointer-events-none">
+                                        <p class="text-gray-400 mb-2">📤 Drag packed image here or click to upload</p>
+                                        <p class="text-gray-500 text-sm">PNG, JPG, TGA...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Unpack Button -->
+                            <button id="unpack-button" class="btn-primary w-full">
+                                Unpack Texture
+                            </button>
+                        </div>
+
+                        <!-- Results Section -->
+                        <div>
+                            <h2 class="text-2xl font-bold mb-6 text-teal-400">Extracted Channels</h2>
+
+                            <!-- Channel Results Grid -->
+                            <div id="unpack-results" class="space-y-4">
+                                <!-- Populated dynamically -->
+                            </div>
+
+                            <!-- Loading Indicator -->
+                            <div id="unpack-loading" class="hidden text-center text-gray-400 py-8">
+                                <p>Unpacking texture...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Progress Indicator -->
+        <div id="progress-container" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-gray-800 rounded-lg p-8 max-w-md w-full mx-4">
+                <p class="text-gray-100 mb-4" id="progress-message">Processing...</p>
+                <div class="progress-bar">
+                    <div class="progress-bar-fill" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Notification -->
+        <div id="error-container" class="hidden fixed top-4 right-4 bg-red-900 border border-red-700 text-red-100 px-6 py-4 rounded-lg max-w-md">
+            <p id="error-message"></p>
+            <button onclick="document.getElementById('error-container').classList.add('hidden')" class="mt-2 text-sm text-red-300 hover:text-red-100">
+                Dismiss
+            </button>
+        </div>
+
+        <!-- Success Notification -->
+        <div id="success-container" class="hidden fixed top-4 right-4 bg-green-900 border border-green-700 text-green-100 px-6 py-4 rounded-lg max-w-md">
+            <p id="success-message"></p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
