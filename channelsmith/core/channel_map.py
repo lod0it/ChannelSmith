@@ -31,10 +31,7 @@ class ChannelMap:
     """
 
     def __init__(
-        self,
-        map_type: str,
-        default_value: float,
-        description: Optional[str] = None
+        self, map_type: str, default_value: float, description: Optional[str] = None
     ):
         """
         Initialize a ChannelMap instance.
@@ -60,7 +57,7 @@ class ChannelMap:
 
         self.map_type = map_type
         self.default_value = default_value
-        self.description = description or map_type.replace('_', ' ').title()
+        self.description = description or map_type.replace("_", " ").title()
 
     def __repr__(self) -> str:
         """
@@ -95,55 +92,27 @@ class ChannelMap:
 
 
 # Predefined channel types with context-aware default values
-AMBIENT_OCCLUSION = ChannelMap(
-    'ambient_occlusion',
-    1.0,
-    'Ambient Occlusion'
-)
+AMBIENT_OCCLUSION = ChannelMap("ambient_occlusion", 1.0, "Ambient Occlusion")
 
-ROUGHNESS = ChannelMap(
-    'roughness',
-    0.5,
-    'Roughness'
-)
+ROUGHNESS = ChannelMap("roughness", 0.5, "Roughness")
 
-METALLIC = ChannelMap(
-    'metallic',
-    0.0,
-    'Metallic'
-)
+METALLIC = ChannelMap("metallic", 0.0, "Metallic")
 
-DISPLACEMENT = ChannelMap(
-    'displacement',
-    0.5,
-    'Displacement'
-)
+DISPLACEMENT = ChannelMap("displacement", 0.5, "Displacement")
 
-HEIGHT = ChannelMap(
-    'height',
-    0.5,
-    'Height'
-)
+HEIGHT = ChannelMap("height", 0.5, "Height")
 
-OPACITY = ChannelMap(
-    'opacity',
-    1.0,
-    'Opacity'
-)
+OPACITY = ChannelMap("opacity", 1.0, "Opacity")
 
-ALPHA = ChannelMap(
-    'alpha',
-    1.0,
-    'Alpha'
-)
+ALPHA = ChannelMap("alpha", 1.0, "Alpha")
 
 # Dictionary for easy lookup by type name
 PREDEFINED_CHANNELS = {
-    'ambient_occlusion': AMBIENT_OCCLUSION,
-    'roughness': ROUGHNESS,
-    'metallic': METALLIC,
-    'displacement': DISPLACEMENT,
-    'height': HEIGHT,
-    'opacity': OPACITY,
-    'alpha': ALPHA,
+    "ambient_occlusion": AMBIENT_OCCLUSION,
+    "roughness": ROUGHNESS,
+    "metallic": METALLIC,
+    "displacement": DISPLACEMENT,
+    "height": HEIGHT,
+    "opacity": OPACITY,
+    "alpha": ALPHA,
 }

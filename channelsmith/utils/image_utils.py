@@ -6,25 +6,26 @@ and NumPy, including loading/saving images from disk and converting between
 PIL Image and NumPy array formats.
 """
 
+import logging
 from pathlib import Path
 from typing import Optional
+
 import numpy as np
 from PIL import Image
+
+logger = logging.getLogger(__name__)
 
 
 class ImageLoadError(Exception):
     """Raised when an image file cannot be loaded."""
-    pass
 
 
 class ImageSaveError(Exception):
     """Raised when an image file cannot be saved."""
-    pass
 
 
 class ImageConversionError(Exception):
     """Raised when image conversion fails."""
-    pass
 
 
 def load_image(path: str) -> Image.Image:
@@ -52,39 +53,32 @@ def load_image(path: str) -> Image.Image:
 
     # Check if file exists
     if not image_path.exists():
-        raise FileNotFoundError(
-            f"Image file not found: {path}"
-        )
+        raise FileNotFoundError(f"Image file not found: {path}")
 
     # Attempt to load the image
     try:
         image = Image.open(image_path)
         # Force load the image data to catch corrupted files early
         image.load()
+        logger.debug("Loaded image '%s' (%s, %dx%d)", path, image.mode, *image.size)
         return image
     except (IOError, OSError) as e:
-        raise ImageLoadError(
-            f"Failed to load image from '{path}': {e}"
-        ) from e
+        raise ImageLoadError(f"Failed to load image from '{path}': {e}") from e
     except Exception as e:
         raise ImageLoadError(
             f"Unexpected error loading image from '{path}': {e}"
         ) from e
 
 
-def save_image(
-    image: Image.Image,
-    path: str,
-    format: Optional[str] = None
-) -> None:
+def save_image(image: Image.Image, path: str, img_format: Optional[str] = None) -> None:
     """
     Save a PIL Image to a file.
 
     Args:
         image: PIL Image instance to save
         path: Path where the image should be saved
-        format: Optional format string (e.g., 'PNG', 'JPEG', 'TGA').
-                If not provided, format is inferred from file extension.
+        img_format: Optional format string (e.g., 'PNG', 'JPEG', 'TGA').
+                    If not provided, format is inferred from file extension.
 
     Raises:
         ImageSaveError: If the image cannot be saved
@@ -93,12 +87,10 @@ def save_image(
     Example:
         >>> image = Image.new('RGB', (512, 512))
         >>> save_image(image, 'output/packed.png')
-        >>> save_image(image, 'output/packed.tga', format='TGA')
+        >>> save_image(image, 'output/packed.tga', img_format='TGA')
     """
     if not isinstance(image, Image.Image):
-        raise TypeError(
-            f"Expected PIL Image instance, got {type(image).__name__}"
-        )
+        raise TypeError(f"Expected PIL Image instance, got {type(image).__name__}")
 
     output_path = Path(path)
 
@@ -106,37 +98,35 @@ def save_image(
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Determine format
-    if format is None:
+    resolved_format = img_format
+    if resolved_format is None:
         # Infer from file extension
-        format = output_path.suffix.upper().lstrip('.')
-        if not format:
+        resolved_format = output_path.suffix.upper().lstrip(".")
+        if not resolved_format:
             raise ImageSaveError(
                 f"Cannot determine image format from path '{path}'. "
-                f"Please provide a file extension or specify format parameter."
+                f"Please provide a file extension or specify img_format parameter."
             )
 
     # Normalize format aliases (JPG -> JPEG)
     format_aliases = {
-        'JPG': 'JPEG',
-        'TIF': 'TIFF',
+        "JPG": "JPEG",
+        "TIF": "TIFF",
     }
-    format = format_aliases.get(format, format)
+    resolved_format = format_aliases.get(resolved_format, resolved_format)
 
     # Attempt to save the image
     try:
-        image.save(output_path, format=format)
+        image.save(output_path, format=resolved_format)
+        logger.debug("Saved image to '%s' (format=%s)", path, resolved_format)
     except (IOError, OSError) as e:
-        raise ImageSaveError(
-            f"Failed to save image to '{path}': {e}"
-        ) from e
+        raise ImageSaveError(f"Failed to save image to '{path}': {e}") from e
     except (ValueError, KeyError) as e:
         raise ImageSaveError(
-            f"Invalid format '{format}' for saving image: {e}"
+            f"Invalid format '{resolved_format}' for saving image: {e}"
         ) from e
     except Exception as e:
-        raise ImageSaveError(
-            f"Unexpected error saving image to '{path}': {e}"
-        ) from e
+        raise ImageSaveError(f"Unexpected error saving image to '{path}': {e}") from e
 
 
 def to_grayscale(image: Image.Image) -> np.ndarray:
@@ -165,14 +155,12 @@ def to_grayscale(image: Image.Image) -> np.ndarray:
         dtype('uint8')
     """
     if not isinstance(image, Image.Image):
-        raise TypeError(
-            f"Expected PIL Image instance, got {type(image).__name__}"
-        )
+        raise TypeError(f"Expected PIL Image instance, got {type(image).__name__}")
 
     try:
         # Convert to grayscale if not already
-        if image.mode != 'L':
-            image = image.convert('L')
+        if image.mode != "L":
+            image = image.convert("L")
 
         # Convert to NumPy array
         array = np.array(image, dtype=np.uint8)
@@ -189,9 +177,7 @@ def to_grayscale(image: Image.Image) -> np.ndarray:
         # Re-raise our custom exceptions
         raise
     except Exception as e:
-        raise ImageConversionError(
-            f"Failed to convert image to grayscale: {e}"
-        ) from e
+        raise ImageConversionError(f"Failed to convert image to grayscale: {e}") from e
 
 
 def from_grayscale(array: np.ndarray) -> Image.Image:
@@ -218,9 +204,7 @@ def from_grayscale(array: np.ndarray) -> Image.Image:
         (512, 512)
     """
     if not isinstance(array, np.ndarray):
-        raise TypeError(
-            f"Expected NumPy array, got {type(array).__name__}"
-        )
+        raise TypeError(f"Expected NumPy array, got {type(array).__name__}")
 
     try:
         # Validate array dimensions
@@ -235,7 +219,7 @@ def from_grayscale(array: np.ndarray) -> Image.Image:
             array = np.clip(array, 0, 255).astype(np.uint8)
 
         # Create PIL Image
-        image = Image.fromarray(array, mode='L')
+        image = Image.fromarray(array, mode="L")
         return image
 
     except ImageConversionError:
@@ -312,18 +296,10 @@ def get_image_info(path: str) -> dict:
     image_path = Path(path)
 
     if not image_path.exists():
-        raise FileNotFoundError(
-            f"Image file not found: {path}"
-        )
+        raise FileNotFoundError(f"Image file not found: {path}")
 
     try:
         with Image.open(image_path) as img:
-            return {
-                'size': img.size,
-                'mode': img.mode,
-                'format': img.format
-            }
+            return {"size": img.size, "mode": img.mode, "format": img.format}
     except (IOError, OSError) as e:
-        raise ImageLoadError(
-            f"Failed to get image info from '{path}': {e}"
-        ) from e
+        raise ImageLoadError(f"Failed to get image info from '{path}': {e}") from e

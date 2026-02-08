@@ -172,7 +172,7 @@ class TestSaveImage:
         image = Image.new('RGB', (128, 128))
         output_path = tmp_path / "output.custom"
 
-        save_image(image, str(output_path), format='PNG')
+        save_image(image, str(output_path), img_format='PNG')
 
         assert output_path.exists()
 
@@ -207,7 +207,7 @@ class TestSaveImage:
         output_path = tmp_path / "output.png"
 
         with pytest.raises(ImageSaveError, match="Invalid format"):
-            save_image(image, str(output_path), format='INVALID_FORMAT')
+            save_image(image, str(output_path), img_format='INVALID_FORMAT')
 
 
 class TestToGrayscale:

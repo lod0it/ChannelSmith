@@ -5,22 +5,23 @@ This module provides the core functionality for packing multiple grayscale
 texture channels into a single RGB or RGBA image.
 """
 
+import logging
 from typing import List, Dict, Optional, Tuple, Union
+
 import numpy as np
 from PIL import Image
 
 from channelsmith.core.validator import (
     validate_channel_data,
-    validate_arrays_for_packing,
-    get_max_resolution,
 )
 from channelsmith.core.packing_template import PackingTemplate
 from channelsmith.utils.image_utils import to_grayscale, from_grayscale
 
+logger = logging.getLogger(__name__)
+
 
 def normalize_resolution(
-    arrays: List[np.ndarray],
-    target_size: Tuple[int, int]
+    arrays: List[np.ndarray], target_size: Tuple[int, int]
 ) -> List[np.ndarray]:
     """
     Normalize all arrays to the target resolution using bilinear interpolation.
@@ -75,7 +76,9 @@ def normalize_resolution(
             img = from_grayscale(arr)
 
             # Resize using bilinear interpolation
-            resized_img = img.resize((target_width, target_height), Image.BILINEAR)
+            resized_img = img.resize(
+                (target_width, target_height), Image.Resampling.BILINEAR
+            )
 
             # Convert back to NumPy array
             resized_arr = to_grayscale(resized_img)
@@ -84,11 +87,11 @@ def normalize_resolution(
     return normalized
 
 
-def pack_channels(
+def pack_channels(  # pylint: disable=too-many-locals
     r: Optional[np.ndarray] = None,
     g: Optional[np.ndarray] = None,
     b: Optional[np.ndarray] = None,
-    a: Optional[np.ndarray] = None
+    a: Optional[np.ndarray] = None,
 ) -> Image.Image:
     """
     Pack grayscale channel arrays into a single RGB or RGBA image.
@@ -122,12 +125,20 @@ def pack_channels(
     """
     # Collect non-None channels
     channels = [r, g, b, a]
-    channel_names = ['R', 'G', 'B', 'A']
+    channel_names = ["R", "G", "B", "A"]
 
-    valid_channels = [(ch, name) for ch, name in zip(channels, channel_names) if ch is not None]
+    valid_channels = [
+        (ch, name) for ch, name in zip(channels, channel_names) if ch is not None
+    ]
 
     if not valid_channels:
         raise ValueError("At least one channel must be provided (not None)")
+
+    logger.debug(
+        "Packing %d channels: %s",
+        len(valid_channels),
+        [name for _, name in valid_channels],
+    )
 
     # Validate each array individually
     valid_arrays = [ch for ch, _ in valid_channels]
@@ -143,11 +154,13 @@ def pack_channels(
     normalized_channels = normalize_resolution(valid_arrays, target_size)
 
     # Map normalized arrays back to RGBA slots
-    normalized_map = dict(zip([name for _, name in valid_channels], normalized_channels))
+    normalized_map = dict(
+        zip([name for _, name in valid_channels], normalized_channels)
+    )
 
     # Build the final channel list with zeros for missing channels
     final_channels = []
-    for ch_name in ['R', 'G', 'B']:
+    for ch_name in ["R", "G", "B"]:
         if ch_name in normalized_map:
             final_channels.append(normalized_map[ch_name])
         else:
@@ -155,26 +168,33 @@ def pack_channels(
             final_channels.append(np.zeros((max_height, max_width), dtype=np.uint8))
 
     # Determine if we need alpha channel
-    has_alpha = 'A' in normalized_map
+    has_alpha = "A" in normalized_map
 
     if has_alpha:
-        final_channels.append(normalized_map['A'])
-        mode = 'RGBA'
+        final_channels.append(normalized_map["A"])
+        mode = "RGBA"
     else:
-        mode = 'RGB'
+        mode = "RGB"
 
     # Stack channels along the third axis
     stacked = np.stack(final_channels, axis=2)
 
+    # Ensure uint8 dtype for PIL compatibility
+    if stacked.dtype != np.uint8:
+        stacked = np.clip(stacked, 0, 255).astype(np.uint8)
+
     # Create PIL Image
     packed_image = Image.fromarray(stacked, mode=mode)
 
+    logger.info(
+        "Packed %s image %dx%d", mode, packed_image.size[0], packed_image.size[1]
+    )
     return packed_image
 
 
-def pack_texture_from_template(
+def pack_texture_from_template(  # pylint: disable=too-many-locals,too-many-branches
     textures: Dict[str, Optional[Union[str, Image.Image, np.ndarray]]],
-    template: PackingTemplate
+    template: PackingTemplate,
 ) -> Image.Image:
     """
     Pack textures according to a template's channel mapping.
@@ -211,6 +231,7 @@ def pack_texture_from_template(
         >>> packed.mode
         'RGB'
     """
+    # pylint: disable=import-outside-toplevel
     from channelsmith.utils.image_utils import load_image
 
     if not isinstance(template, PackingTemplate):
@@ -221,7 +242,7 @@ def pack_texture_from_template(
     # Build channel arrays for RGBA slots
     channel_arrays = {}
 
-    for channel_key in ['R', 'G', 'B', 'A']:
+    for channel_key in ["R", "G", "B", "A"]:
         channel_map = template.get_channel(channel_key)
 
         if channel_map is None:
@@ -272,33 +293,28 @@ def pack_texture_from_template(
         target_width, target_height = max_width, max_height
 
     # Fill missing channels with default values
-    for channel_key in ['R', 'G', 'B', 'A']:
+    for channel_key in ["R", "G", "B", "A"]:
         if channel_arrays[channel_key] is None:
             channel_map = template.get_channel(channel_key)
             if channel_map is not None:
                 # Create array filled with default value
                 default_value_uint8 = int(channel_map.default_value * 255)
                 channel_arrays[channel_key] = np.full(
-                    (target_height, target_width),
-                    default_value_uint8,
-                    dtype=np.uint8
+                    (target_height, target_width), default_value_uint8, dtype=np.uint8
                 )
 
     # Pack the channels
     packed = pack_channels(
-        r=channel_arrays.get('R'),
-        g=channel_arrays.get('G'),
-        b=channel_arrays.get('B'),
-        a=channel_arrays.get('A')
+        r=channel_arrays.get("R"),
+        g=channel_arrays.get("G"),
+        b=channel_arrays.get("B"),
+        a=channel_arrays.get("A"),
     )
 
     return packed
 
 
-def create_default_channel(
-    size: Tuple[int, int],
-    default_value: float
-) -> np.ndarray:
+def create_default_channel(size: Tuple[int, int], default_value: float) -> np.ndarray:
     """
     Create a channel array filled with a default value.
 
@@ -316,7 +332,7 @@ def create_default_channel(
         >>> channel[0, 0]
         127
     """
-    if not (0.0 <= default_value <= 1.0):
+    if not 0.0 <= default_value <= 1.0:
         raise ValueError(
             f"default_value must be between 0.0 and 1.0, got {default_value}"
         )

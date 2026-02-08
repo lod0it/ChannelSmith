@@ -45,7 +45,7 @@ class PackingTemplate:
         self,
         name: str,
         description: str,
-        channels: Optional[Dict[str, Optional[ChannelMap]]] = None
+        channels: Optional[Dict[str, Optional[ChannelMap]]] = None,
     ):
         """
         Initialize a PackingTemplate instance.
@@ -77,15 +77,15 @@ class PackingTemplate:
 
         # Initialize channels dictionary with None values
         self.channels: Dict[str, Optional[ChannelMap]] = {
-            'R': None,
-            'G': None,
-            'B': None,
-            'A': None
+            "R": None,
+            "G": None,
+            "B": None,
+            "A": None,
         }
 
         # Validate and update channels if provided
         if channels:
-            valid_keys = {'R', 'G', 'B', 'A'}
+            valid_keys = {"R", "G", "B", "A"}
             invalid_keys = set(channels.keys()) - valid_keys
             if invalid_keys:
                 raise ValueError(
@@ -117,7 +117,7 @@ class PackingTemplate:
             >>> template.get_channel('A')  # Unused channel
             None
         """
-        if key not in {'R', 'G', 'B', 'A'}:
+        if key not in {"R", "G", "B", "A"}:
             raise KeyError(
                 f"Invalid channel key: '{key}'. Must be 'R', 'G', 'B', or 'A'"
             )
@@ -147,7 +147,7 @@ class PackingTemplate:
             >>> template.is_channel_used('A')
             False
         """
-        if key not in {'R', 'G', 'B', 'A'}:
+        if key not in {"R", "G", "B", "A"}:
             raise KeyError(
                 f"Invalid channel key: '{key}'. Must be 'R', 'G', 'B', or 'A'"
             )
@@ -178,7 +178,7 @@ class PackingTemplate:
             >>> rgba_template.is_rgba()
             True
         """
-        return self.is_channel_used('A')
+        return self.is_channel_used("A")
 
     def get_used_channels(self) -> Dict[str, ChannelMap]:
         """
@@ -236,8 +236,7 @@ class PackingTemplate:
             Channels: R (ambient_occlusion), G (roughness), B (metallic)
         """
         used_channels = self.get_used_channels()
-        channel_info = ', '.join(
-            f"{key} ({channel.map_type})"
-            for key, channel in used_channels.items()
+        channel_info = ", ".join(
+            f"{key} ({channel.map_type})" for key, channel in used_channels.items()
         )
         return f"{self.name}: {self.description}\nChannels: {channel_info}"

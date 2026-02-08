@@ -13,12 +13,10 @@ from PIL import Image
 
 class ResolutionMismatchError(Exception):
     """Raised when image resolutions don't match."""
-    pass
 
 
 class InvalidChannelDataError(Exception):
     """Raised when channel data is invalid or malformed."""
-    pass
 
 
 def check_resolution_match(images: List[Image.Image]) -> bool:
@@ -109,7 +107,7 @@ def get_max_resolution(images: List[Image.Image]) -> Tuple[int, int]:
 def validate_channel_data(
     data: np.ndarray,
     expected_shape: Optional[Tuple[int, int]] = None,
-    allow_empty: bool = False
+    allow_empty: bool = False,
 ) -> None:
     """
     Validate that channel data is suitable for packing operations.
@@ -149,9 +147,7 @@ def validate_channel_data(
 
     # Check if empty
     if data.size == 0 and not allow_empty:
-        raise InvalidChannelDataError(
-            "Channel data cannot be empty (zero-sized array)"
-        )
+        raise InvalidChannelDataError("Channel data cannot be empty (zero-sized array)")
 
     # Check expected shape if provided
     if expected_shape is not None:
@@ -168,8 +164,7 @@ def validate_channel_data(
 
 
 def validate_images_for_packing(
-    images: List[Optional[Image.Image]],
-    require_all: bool = False
+    images: List[Optional[Image.Image]], require_all: bool = False
 ) -> Tuple[int, int]:
     """
     Validate a list of images for channel packing operations.
@@ -209,9 +204,7 @@ def validate_images_for_packing(
     # Check if all images required
     if require_all and len(valid_images) != len(images):
         none_count = len(images) - len(valid_images)
-        raise ValueError(
-            f"All images are required, but {none_count} image(s) are None"
-        )
+        raise ValueError(f"All images are required, but {none_count} image(s) are None")
 
     # Validate that all non-None items are PIL Images
     for i, img in enumerate(images):
@@ -233,8 +226,7 @@ def validate_images_for_packing(
 
 
 def validate_arrays_for_packing(
-    arrays: List[Optional[np.ndarray]],
-    require_all: bool = False
+    arrays: List[Optional[np.ndarray]], require_all: bool = False
 ) -> Tuple[int, int]:
     """
     Validate a list of NumPy arrays for channel packing operations.
@@ -273,9 +265,7 @@ def validate_arrays_for_packing(
     # Check if all arrays required
     if require_all and len(valid_arrays) != len(arrays):
         none_count = len(arrays) - len(valid_arrays)
-        raise ValueError(
-            f"All arrays are required, but {none_count} array(s) are None"
-        )
+        raise ValueError(f"All arrays are required, but {none_count} array(s) are None")
 
     # Validate each non-None array
     for i, arr in enumerate(arrays):
