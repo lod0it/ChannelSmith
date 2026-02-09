@@ -192,7 +192,6 @@ save_image(packed, "output/material_orm.png")
 ### Testing & Development
 - **[WEB_UI_TESTING.md](docs/WEB_UI_TESTING.md)** - Web UI testing guide
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute and code standards
-- **[CLAUDE.md](CLAUDE.md)** - Architecture and development guidelines
 
 ### Release Information
 - **[CHANGELOG.md](CHANGELOG.md)** - Version history and release notes
@@ -224,7 +223,6 @@ ChannelSmith/
 │   └── ...
 ├── docs/                      # Documentation
 ├── WEB_UI_TESTING.md          # Web UI testing guide (NEW)
-├── CLAUDE.md                  # Development guidelines
 ├── SETUP.md                   # Installation guide
 ├── requirements.txt           # Python dependencies
 └── README.md                  # This file
@@ -285,39 +283,6 @@ pytest tests/test_core/test_packing_engine.py
 
 This is currently a private project. Contribution guidelines will be added upon public release.
 
----
-
-## 🎓 For Developers
-
-### First Time Setup
-
-1. Read [SETUP.md](SETUP.md) for environment setup
-2. Read [CLAUDE.md](CLAUDE.md) for architecture overview
-3. Check [ALPHA_TASKS.md](ALPHA_TASKS.md) for current tasks
-4. Review [docs/MVP_Documentation.md](docs/MVP_Documentation.md) for full specs
-
-### Development Workflow
-
-1. Activate virtual environment: `source venv/bin/activate`
-2. Create feature: Work on `dev` branch
-3. **Write tests first** (TDD approach)
-   - Core logic: `tests/test_core/`
-   - API endpoints: `tests/test_api/`
-   - GUI: `tests/test_gui/`
-4. Format code: `black channelsmith/`
-5. Run tests: `pytest tests/` (expect 229+ passing)
-6. Run API tests specifically: `pytest tests/test_api/ -v`
-7. Commit: `git commit -m "feat(scope): description"`
-
-### Testing the Web UI
-
-See **[WEB_UI_TESTING.md](WEB_UI_TESTING.md)** for complete guide including:
-- Quick start (2 minutes)
-- Automated API tests
-- Manual testing workflows
-- Edge case testing
-- Browser compatibility
-
 ### Code Standards
 
 - **File naming:** snake_case
@@ -336,12 +301,6 @@ This software is intended for commercial distribution.
 
 ---
 
-## 📞 Contact
-
-For inquiries about ChannelSmith, please contact [your email/contact info].
-
----
-
 **Status:** Web MVP Complete - Post-Beta
 **Version:** 0.1.0-web-mvp
-**Last Updated:** February 8, 2026
+**Last Updated:** February 9, 2026
