@@ -5,7 +5,8 @@ This module creates and configures the Flask application with CORS support
 and route registration.
 """
 
-from flask import Flask
+from pathlib import Path
+from flask import Flask, send_file
 from flask_cors import CORS
 
 
@@ -35,5 +36,14 @@ def create_app() -> Flask:
     def index():  # pylint: disable=unused-variable
         """Serve the main HTML page."""
         return app.send_static_file("index.html")
+
+    # Serve cs_wiki.md documentation
+    @app.route("/cs_wiki.md")
+    def serve_wiki():  # pylint: disable=unused-variable
+        """Serve the ChannelSmith wiki documentation."""
+        wiki_path = Path(__file__).parent.parent.parent / "cs_wiki.md"
+        if wiki_path.exists():
+            return send_file(str(wiki_path), mimetype="text/markdown")
+        return "Documentation not found", 404
 
     return app

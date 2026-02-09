@@ -12,6 +12,7 @@ This module:
 
 import argparse
 import logging
+import os
 import sys
 import webbrowser
 from threading import Timer
@@ -48,7 +49,7 @@ def launch_web_ui() -> int:
 
         app = create_app()
 
-        # Auto-open browser after 1 second
+        # Auto-open browser after 1 second (only in main process, not reloader)
         def open_browser() -> None:
             """Open the default browser to the app."""
             try:
@@ -56,7 +57,9 @@ def launch_web_ui() -> int:
             except Exception as e:
                 logger.warning("Failed to open browser: %s", e)
 
-        Timer(1.0, open_browser).start()
+        # Only open browser in main process, not in Flask's reloader subprocess
+        if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+            Timer(1.0, open_browser).start()
 
         if IS_PYINSTALLER:
             logger.info("Starting ChannelSmith Web UI server...")
