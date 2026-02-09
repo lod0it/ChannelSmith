@@ -143,7 +143,7 @@ See [USER_GUIDE.md](docs/USER_GUIDE.md) for detailed instructions.
 
 #### Complete Testing Guide
 
-See **[WEB_UI_TESTING.md](WEB_UI_TESTING.md)** for:
+See **[WEB_UI_TESTING.md](docs/WEB_UI_TESTING.md)** for:
 - Automated API tests (22 tests, all passing)
 - Manual testing workflows
 - Edge case testing
@@ -186,11 +186,11 @@ save_image(packed, "output/material_orm.png")
 
 ### Installation & Getting Started
 - **[INSTALL.md](INSTALL.md)** ⭐ **START HERE** - Complete installation guide (3 methods)
-- **[SETUP.md](SETUP.md)** - Environment setup for developers
+- **[SETUP.md](docs/SETUP.md)** - Environment setup for developers
 - **[cs_wiki.md](cs_wiki.md)** - User guide with workflows and FAQs (also in-app)
 
 ### Testing & Development
-- **[WEB_UI_TESTING.md](WEB_UI_TESTING.md)** - Web UI testing guide
+- **[WEB_UI_TESTING.md](docs/WEB_UI_TESTING.md)** - Web UI testing guide
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute and code standards
 - **[CLAUDE.md](CLAUDE.md)** - Architecture and development guidelines
 
