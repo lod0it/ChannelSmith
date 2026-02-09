@@ -389,7 +389,7 @@ See [docs/RELEASE_PROCESS.md](docs/RELEASE_PROCESS.md) for detailed steps.
 
 - **GitHub Issues** for bugs and features
 - **Discussions** (coming soon) for general questions
-- **Email** [contact info] for private inquiries
+- **Email** <a href="mailto:indirizzo@email.com">giuseppe.alfano.3d@gmail.com</a> for private inquiries
 
 ---
 

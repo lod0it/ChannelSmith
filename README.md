@@ -268,8 +268,15 @@ pytest tests/test_core/test_packing_engine.py
 ---
 
 ## 🤝 Contributing
+Contributions are welcome! Please read CONTRIBUTING.md for:
 
-This is currently a private project. Contribution guidelines will be added upon public release.
+Code of conduct
+Development setup
+Coding standards
+Pull request process
+Testing requirements
+
+This project is licensed under the MIT License - see LICENSE for details.
 
 ---
 
@@ -316,17 +323,22 @@ See **[WEB_UI_TESTING.md](WEB_UI_TESTING.md)** for complete guide including:
 
 ## 📄 License
 
-Proprietary - All rights reserved.  
-This software is intended for commercial distribution.
+This project is licensed under the **MIT** License - see the [LICENSE](/LICENSE) file for details.
+Copyright (c) 2026 **Giuseppe Alfano**
 
 ---
 
 ## 📞 Contact
 
-For inquiries about ChannelSmith, please contact [your email/contact info].
+- GitHub Issues: [Report bugs or request features](https://github.com/lod0it/ChannelSmith/issues)
+- Email: For commercial inquiries or private discussions reach out  to <a href="mailto:indirizzo@email.com">giuseppe.alfano.3d@gmail.com</a>
 
 ---
 
-**Status:** Web MVP Complete - Post-Beta
-**Version:** 0.1.0-web-mvp
-**Last Updated:** February 8, 2026
+### **Status:** WebUI - Beta
+**Version:** 0.3.0
+**Last Updated:** February 9, 2026
+
+---
+
+### Made with ❤️ by [lod0it](https://github.com/lod0it) & [Claude](https://claude.com/product/claude-code)
