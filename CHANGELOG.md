@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Planned
+- Batch processing mode
+- Custom template UI editor
+- Advanced preview filters
+
+---
+
+## [0.3.0] - 2026-02-09
+
+### Added
+- **Alpha channel support** for texture packing and unpacking
+  - Pack textures with optional alpha channel (RGBA output)
+  - Unpack textures preserving alpha channel when present
+  - Smart defaults handling (RGBA output only if alpha provided)
+  - Backward compatible: RGB-only packing still works as before
+- **Alpha channel auto-extraction** from RGBA textures
+  - Automatically extracts alpha from RGBA images during unpacking
+  - Non-breaking: RGB images remain unchanged (3 channels)
+  - Enables unpacking of game textures with embedded alpha (BaseColor + alpha)
+- **Unpack Texture UI redesign** - 2x2 grid layout
+  - All 4 channels (R, G, B, A) displayed in organized grid
+  - Individual download buttons for each channel
+  - Enhanced preview with zoom functionality
+  - Alpha channel shows only when unpacking RGBA images
+- **Manual update notification system**
+  - GitHub Releases integration for version checking
+  - Display latest release notes in Info panel
+  - One-click download links for Windows/macOS/Linux binaries
+  - Checks performed manually (no automatic telemetry)
+
 ### Removed
 - **Legacy tkinter GUI** - Completely removed in favor of Web UI
   - Removed entire `channelsmith/gui/` module (~2,500 LOC)
@@ -15,10 +45,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Reduced codebase by ~3,000 lines
   - **BREAKING CHANGE:** --gui flag no longer supported
 
-### Planned
-- Batch processing mode
-- Custom template UI editor
-- Advanced preview filters
+### Fixed
+- Alpha channel handling in pack/unpack templates
+  - ORM, ORD, and Free templates now support optional alpha channel
+  - Fixed pack logic to output RGBA when user provides alpha input
+  - Fixed unpack logic to skip alpha extraction when template doesn't define it
+
+### Technical Details
+- All 358 tests passing ✓
+- No breaking changes to core API (texture packing/unpacking)
+- Complete pack→unpack cycle with alpha verified working
+- Web UI fully functional with alpha channel workflows
 
 ---
 
@@ -118,7 +155,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/yourusername/channelsmith/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/yourusername/channelsmith/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/yourusername/channelsmith/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/yourusername/channelsmith/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/yourusername/channelsmith/compare/v0.0.1...v0.1.0
 [0.0.1]: https://github.com/yourusername/channelsmith/releases/tag/v0.0.1
