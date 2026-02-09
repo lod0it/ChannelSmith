@@ -5,8 +5,8 @@
 ![Status](https://img.shields.io/badge/status-beta-brightgreen)
 ![Version](https://img.shields.io/badge/version-0.3.0-blue)
 ![Python](https://img.shields.io/badge/python-3.8+-blue)
-![Platform](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey)
-![License](https://img.shields.io/badge/license-proprietary-red)
+![Platform](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-purple)
+[![License: MIT](https://img.shields.io/badge/License-MIT-social.svg)](https://opensource.org/licenses/MIT)
 ![Tests](https://img.shields.io/badge/tests-358%20passing-brightgreen)
 
 ---
