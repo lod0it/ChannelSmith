@@ -798,6 +798,9 @@ function displayUnpackedChannels(channels) {
     const resultsContainer = document.getElementById('unpack-results');
     resultsContainer.innerHTML = '';
 
+    // Debug logging
+    console.log('displayUnpackedChannels received channels:', Object.keys(channels));
+
     // Channel position labels
     const channelLabels = {
         R: { label: 'Red Channel', color: 'bg-red-600' },
@@ -808,19 +811,26 @@ function displayUnpackedChannels(channels) {
 
     // Create grid container for 2x2 layout
     const gridContainer = document.createElement('div');
-    gridContainer.className = 'grid grid-cols-2 gap-6';
+    gridContainer.style.display = 'grid';
+    gridContainer.style.gridTemplateColumns = 'repeat(2, 1fr)';
+    gridContainer.style.gap = '24px';
 
     // Display channels in order: R, G, B, A
     const channelOrder = ['R', 'G', 'B', 'A'];
     for (const channelPos of channelOrder) {
-        if (!(channelPos in channels)) continue;
+        if (!(channelPos in channels)) {
+            console.log(`Channel ${channelPos} not found in response`);
+            continue;
+        }
+        console.log(`Displaying channel ${channelPos}`);
 
         const base64Data = channels[channelPos];
         const info = channelLabels[channelPos];
 
         // Create wrapper for card + button
         const wrapper = document.createElement('div');
-        wrapper.className = 'flex flex-col';
+        wrapper.style.display = 'flex';
+        wrapper.style.flexDirection = 'column';
 
         // Create preview card (matching pack section structure)
         const card = document.createElement('div');
@@ -836,7 +846,9 @@ function displayUnpackedChannels(channels) {
 
         // Create download button container
         const downloadContainer = document.createElement('div');
-        downloadContainer.className = 'flex justify-center mt-4';
+        downloadContainer.style.display = 'flex';
+        downloadContainer.style.justifyContent = 'center';
+        downloadContainer.style.marginTop = '16px';
         const downloadBtn = document.createElement('button');
         downloadBtn.className = 'pill-button-download';
         downloadBtn.onclick = () => downloadChannel(channelPos, base64Data);
