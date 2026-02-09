@@ -91,6 +91,9 @@ test_output/
 *.jpeg
 *.tiff
 
+# Keep file in Imgs folder
+!imgs/*.jpg
+
 # But keep template examples
 !channelsmith/templates/*.json
 !examples/*.png
