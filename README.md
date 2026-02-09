@@ -131,16 +131,6 @@ The browser opens automatically at **http://localhost:5000**
 4. Click **"Unpack Texture"**
 5. Download extracted channels as individual PNG files
 
-#### Legacy GUI (Deprecated but Functional)
-
-If you prefer the classic tkinter interface:
-
-```bash
-python -m channelsmith --gui
-```
-
-See [USER_GUIDE.md](docs/USER_GUIDE.md) for detailed instructions.
-
 #### Complete Testing Guide
 
 See **[WEB_UI_TESTING.md](docs/WEB_UI_TESTING.md)** for:
@@ -210,17 +200,15 @@ ChannelSmith/
 │   │   ├── app.py            # Flask app factory
 │   │   ├── routes.py         # API endpoints (pack, unpack, templates)
 │   │   └── utils.py          # Image utilities & validation
-│   ├── frontend/              # Web UI (NEW)
+│   ├── frontend/              # Web UI
 │   │   ├── index.html        # Single-page app
 │   │   ├── styles.css        # Tailwind CSS styling
 │   │   └── app.js            # Vanilla JavaScript logic
-│   ├── gui/                   # GUI layer (Legacy, still functional)
 │   ├── templates/             # Template JSON files & loader
 │   └── utils/                 # Utilities
 ├── tests/
-│   ├── test_api/             # API endpoint tests (NEW)
+│   ├── test_api/             # API endpoint tests
 │   ├── test_core/            # Core engine tests
-│   ├── test_gui/             # GUI tests
 │   └── ...
 ├── docs/                      # Documentation
 ├── WEB_UI_TESTING.md          # Web UI testing guide (NEW)
@@ -248,7 +236,6 @@ ChannelSmith/
 - ✅ Browser auto-launch
 - ✅ API tests (22 comprehensive tests, all passing)
 - ✅ Core tests (207 tests, all passing, no regressions)
-- ✅ Legacy tkinter GUI still functional
 - 🔄 Advanced features (batch processing, custom templates UI)
 
 **Test Coverage:**
@@ -259,8 +246,7 @@ ChannelSmith/
 ### Roadmap
 
 - **Alpha:** Core engine ✅
-- **Beta:** Tkinter GUI ✅
-- **Web MVP:** Flask + Tailwind web UI ✅
+- **Beta:** Web MVP with Flask + Tailwind ✅
 - **RC:** Bug fixes, performance optimization, advanced features
 - **v1.0:** Production release
 
@@ -303,7 +289,6 @@ This is currently a private project. Contribution guidelines will be added upon 
 3. **Write tests first** (TDD approach)
    - Core logic: `tests/test_core/`
    - API endpoints: `tests/test_api/`
-   - GUI: `tests/test_gui/`
 4. Format code: `black channelsmith/`
 5. Run tests: `pytest tests/` (expect 229+ passing)
 6. Run API tests specifically: `pytest tests/test_api/ -v`

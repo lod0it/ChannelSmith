@@ -7,8 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+- **Legacy tkinter GUI** - Completely removed in favor of Web UI
+  - Removed entire `channelsmith/gui/` module (~2,500 LOC)
+  - Removed `--gui` command-line flag
+  - Removed 212 GUI tests (were already skipped in CI)
+  - Reduced codebase by ~3,000 lines
+  - **BREAKING CHANGE:** --gui flag no longer supported
+
 ### Planned
-- Auto-update checker
 - Batch processing mode
 - Custom template UI editor
 - Advanced preview filters

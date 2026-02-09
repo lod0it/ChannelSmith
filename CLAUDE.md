@@ -4,16 +4,11 @@
 
 ## Running ChannelSmith
 
-### Web UI (Recommended - Default)
+### Web UI
 ```bash
 python -m channelsmith
 ```
 Opens http://localhost:5000 in your browser. Dark theme with Tailwind CSS, pack/unpack workflows, drag-drop support.
-
-### Legacy GUI (tkinter)
-```bash
-python -m channelsmith --gui
-```
 
 ## Core Rules (MANDATORY)
 - **Naming:** snake_case files/functions, PascalCase classes, UPPER_CASE constants
@@ -30,9 +25,8 @@ python -m channelsmith --gui
 ## Architecture
 ```
 core/           Engine (no GUI deps)
-gui/            tkinter UI: legacy (deprecated but functional)
-api/            Flask REST API endpoints (new)
-frontend/       HTML/CSS/JS Web UI (new)
+api/            Flask REST API endpoints
+frontend/       HTML/CSS/JS Web UI
 templates/      JSON: orm.json, ord.json + loader.py
 utils/          image_utils, constants
 ```
