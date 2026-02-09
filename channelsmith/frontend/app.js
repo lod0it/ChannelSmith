@@ -806,6 +806,10 @@ function displayUnpackedChannels(channels) {
         A: { label: 'Alpha Channel', color: 'bg-gray-600' },
     };
 
+    // Create grid container for 2x2 layout
+    const gridContainer = document.createElement('div');
+    gridContainer.className = 'grid grid-cols-2 gap-6';
+
     // Display channels in order: R, G, B, A
     const channelOrder = ['R', 'G', 'B', 'A'];
     for (const channelPos of channelOrder) {
@@ -814,21 +818,35 @@ function displayUnpackedChannels(channels) {
         const base64Data = channels[channelPos];
         const info = channelLabels[channelPos];
 
+        // Create wrapper for card + button
+        const wrapper = document.createElement('div');
+        wrapper.className = 'flex flex-col';
+
+        // Create preview card (matching pack section structure)
         const card = document.createElement('div');
-        card.className = 'unpack-result-item';
+        card.className = 'preview-card clickable';
         card.innerHTML = `
-            <div class="unpack-preview-container">
-                <div class="unpack-image-wrapper clickable">
-                    <div class="preview-label">${info.label}</div>
-                    <img src="${base64Data}" class="w-full rounded-lg unpack-preview-image" style="image-rendering: pixelated;" data-channel="${channelPos}" data-label="${info.label}">
-                </div>
-                <button class="pill-button-download" onclick="downloadChannel('${channelPos}', '${base64Data}')" title="Download ${info.label}">
-                    <strong>Download</strong>
-                </button>
-            </div>
+            <div class="preview-label">${info.label}</div>
+            <img src="${base64Data}"
+                 class="preview-canvas"
+                 style="image-rendering: pixelated;"
+                 data-channel="${channelPos}"
+                 data-label="${info.label}">
         `;
 
-        resultsContainer.appendChild(card);
+        // Create download button container
+        const downloadContainer = document.createElement('div');
+        downloadContainer.className = 'flex justify-center mt-4';
+        const downloadBtn = document.createElement('button');
+        downloadBtn.className = 'pill-button-download';
+        downloadBtn.onclick = () => downloadChannel(channelPos, base64Data);
+        downloadBtn.title = `Download ${info.label}`;
+        downloadBtn.innerHTML = '<strong>Download</strong>';
+        downloadContainer.appendChild(downloadBtn);
+
+        wrapper.appendChild(card);
+        wrapper.appendChild(downloadContainer);
+        gridContainer.appendChild(wrapper);
 
         // Add click handler for zoom
         const img = card.querySelector('img');
@@ -836,6 +854,8 @@ function displayUnpackedChannels(channels) {
             openZoom(img, info.label);
         });
     }
+
+    resultsContainer.appendChild(gridContainer);
 }
 
 function downloadChannel(channelType, base64Data) {
