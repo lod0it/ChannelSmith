@@ -16,6 +16,12 @@
       "type": "metallic",
       "default": 0.0,
       "description": "Blue Channel - Any grayscale texture"
+    },
+    "A": {
+      "type": "opacity",
+      "default": 1.0,
+      "description": "Alpha Channel - Optional grayscale texture",
+      "optional": true
     }
   }
 }

@@ -128,22 +128,22 @@ def unpack_texture(
             f"Expected PackingTemplate instance, got {type(template).__name__}"
         )
 
-    # Check if template requires alpha but image doesn't have it
-    if template.is_rgba() and image.mode != "RGBA":
-        raise ValueError(
-            f"Template '{template.name}' requires alpha channel, "
-            f"but image is '{image.mode}' mode. Expected RGBA image."
-        )
+    # Note: Alpha channel is optional for unpacking, even if template defines it.
+    # We only extract alpha if the image actually has it (RGBA mode).
 
     # Extract each channel defined in the template
     result = {}
     used_channels = template.get_used_channels()
 
     for channel_key, channel_map in used_channels.items():
+        # Skip alpha channel if image doesn't have it (RGB images have no alpha)
+        if channel_key == "A" and image.mode != "RGBA":
+            continue
+
         extracted = extract_channel(image, channel_key)
         result[channel_map.map_type] = extracted
 
-    # AUTO-EXTRACT ALPHA: If image is RGBA and template doesn't define alpha,
+    # AUTO-EXTRACT ALPHA: If image is RGBA and template doesn't already define alpha,
     # automatically extract it so users can preview/download
     if image.mode == "RGBA" and not template.is_channel_used("A"):
         try:

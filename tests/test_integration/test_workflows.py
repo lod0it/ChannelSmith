@@ -462,7 +462,7 @@ class TestWorkflow5ResolutionMismatchHandling:
         packed = pack_texture_from_template({}, orm_template)
 
         assert isinstance(packed, Image.Image)
-        assert packed.mode == 'RGB'
+        assert packed.mode == 'RGBA'  # Now RGBA because template defines alpha
         # Default size should be 1024x1024
         assert packed.size == (1024, 1024)
 

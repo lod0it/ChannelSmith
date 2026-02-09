@@ -30,7 +30,7 @@ class TestLoadTemplate:
         assert template.is_channel_used('R')
         assert template.is_channel_used('G')
         assert template.is_channel_used('B')
-        assert not template.is_channel_used('A')
+        assert template.is_channel_used('A')  # Alpha now supported (optional)
         assert template.get_channel('R').map_type == 'ambient_occlusion'
         assert template.get_channel('G').map_type == 'roughness'
         assert template.get_channel('B').map_type == 'metallic'
@@ -44,7 +44,7 @@ class TestLoadTemplate:
         assert template.is_channel_used('R')
         assert template.is_channel_used('G')
         assert template.is_channel_used('B')
-        assert not template.is_channel_used('A')
+        assert template.is_channel_used('A')  # Alpha now supported (optional)
         assert template.get_channel('R').map_type == 'ambient_occlusion'
         assert template.get_channel('G').map_type == 'roughness'
         assert template.get_channel('B').map_type == 'displacement'

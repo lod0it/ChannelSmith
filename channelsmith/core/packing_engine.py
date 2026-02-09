@@ -293,13 +293,26 @@ def pack_texture_from_template(  # pylint: disable=too-many-locals,too-many-bran
         target_width, target_height = max_width, max_height
 
     # Fill missing channels with default values
-    for channel_key in ["R", "G", "B", "A"]:
+    for channel_key in ["R", "G", "B"]:
         if channel_arrays[channel_key] is None:
             channel_map = template.get_channel(channel_key)
             if channel_map is not None:
                 # Create array filled with default value
                 default_value_uint8 = int(channel_map.default_value * 255)
                 channel_arrays[channel_key] = np.full(
+                    (target_height, target_width), default_value_uint8, dtype=np.uint8
+                )
+
+    # Alpha channel: only fill with default if no user textures were provided at all
+    # Otherwise, require explicit alpha provision for RGBA output
+    if channel_arrays["A"] is None:
+        channel_map = template.get_channel("A")
+        if channel_map is not None:
+            # Only auto-fill alpha if no textures were provided (all-defaults case)
+            # Otherwise, alpha must be explicitly provided for RGBA output
+            if not valid_textures:  # All channels are defaults
+                default_value_uint8 = int(channel_map.default_value * 255)
+                channel_arrays["A"] = np.full(
                     (target_height, target_width), default_value_uint8, dtype=np.uint8
                 )
 

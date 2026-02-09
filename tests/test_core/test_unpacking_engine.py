@@ -220,8 +220,11 @@ class TestUnpackTexture:
         assert channels['metallic'][0, 0] == 0
         assert channels['alpha'][0, 0] == 200
 
-    def test_unpack_rgba_template_with_rgb_image_raises_error(self):
-        """Test that an RGBA template with an RGB image raises ValueError."""
+    def test_unpack_rgba_template_with_rgb_image_skips_alpha(self):
+        """Test that unpacking RGB image with RGBA template skips alpha channel.
+
+        Alpha is optional - unpacking succeeds but only includes R, G, B channels.
+        """
         template = PackingTemplate(
             'ORMA',
             'ORM with Alpha',
@@ -234,8 +237,12 @@ class TestUnpackTexture:
         )
         image = Image.new('RGB', (512, 512), (255, 128, 0))
 
-        with pytest.raises(ValueError, match="requires alpha channel"):
-            unpack_texture(image, template)
+        # Should succeed and return R, G, B but skip alpha
+        result = unpack_texture(image, template)
+        assert 'ambient_occlusion' in result
+        assert 'roughness' in result
+        assert 'metallic' in result
+        assert 'alpha' not in result  # Alpha not present in RGB image
 
     def test_unpack_rgb_template_with_rgba_image(self):
         """Test that an RGB template with an RGBA image auto-extracts alpha."""
