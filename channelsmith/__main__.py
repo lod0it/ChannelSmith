@@ -19,6 +19,9 @@ from typing import Optional
 
 from channelsmith import __version__
 
+# Detect if running as PyInstaller executable
+IS_PYINSTALLER = getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS")
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -26,6 +29,10 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+
+# Suppress werkzeug development server warning in production/executable mode
+if IS_PYINSTALLER:
+    logging.getLogger("werkzeug").setLevel(logging.ERROR)
 
 
 def launch_web_ui() -> int:
@@ -51,12 +58,20 @@ def launch_web_ui() -> int:
 
         Timer(1.0, open_browser).start()
 
-        logger.info("Starting Flask development server...")
+        if IS_PYINSTALLER:
+            logger.info("Starting ChannelSmith Web UI server...")
+        else:
+            logger.info("Starting Flask development server...")
         logger.info("ChannelSmith Web UI: http://localhost:5000")
         logger.info("Press Ctrl+C to stop")
 
-        # Run Flask in debug mode (development)
-        app.run(host="127.0.0.1", port=5000, debug=True, use_reloader=True)
+        # Run Flask: debug mode for development, production mode for executables
+        app.run(
+            host="127.0.0.1",
+            port=5000,
+            debug=not IS_PYINSTALLER,
+            use_reloader=not IS_PYINSTALLER,
+        )
 
         logger.info("ChannelSmith closed normally")
         return 0
