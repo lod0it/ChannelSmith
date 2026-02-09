@@ -350,6 +350,49 @@ class TestUnpackEndpoint:
 
         assert response.status_code == 200
 
+    def test_unpack_rgba_image_auto_extracts_alpha(self, client):
+        """Unpack RGBA image with RGB template should return alpha channel."""
+        img = Image.new('RGBA', (64, 64), (255, 128, 64, 200))
+        img_bytes = io.BytesIO()
+        img.save(img_bytes, format='PNG')
+        img_bytes.seek(0)
+
+        response = client.post(
+            "/api/unpack",
+            data={
+                "template": "ORM",
+                "image": (img_bytes, "test_rgba.png"),
+            },
+            content_type="multipart/form-data",
+        )
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        channels = data["channels"]
+
+        assert "R" in channels
+        assert "G" in channels
+        assert "B" in channels
+        assert "A" in channels  # Auto-extracted
+        assert len(channels) == 4
+
+    def test_unpack_rgb_image_no_alpha_channel(self, client, rgb_image):
+        """Unpack RGB image should not include alpha channel."""
+        response = client.post(
+            "/api/unpack",
+            data={
+                "template": "ORM",
+                "image": (io.BytesIO(rgb_image.getvalue()), "packed.png"),
+            },
+            content_type="multipart/form-data",
+        )
+
+        data = json.loads(response.data)
+        channels = data["channels"]
+
+        assert "A" not in channels
+        assert len(channels) == 3
+
     def test_unpack_with_invalid_template_fails(self, client, rgb_image):
         """Unpack with invalid template should fail."""
         response = client.post(

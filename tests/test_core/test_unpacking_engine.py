@@ -238,16 +238,60 @@ class TestUnpackTexture:
             unpack_texture(image, template)
 
     def test_unpack_rgb_template_with_rgba_image(self):
-        """Test that an RGB template with an RGBA image works (ignores alpha)."""
+        """Test that an RGB template with an RGBA image auto-extracts alpha."""
         template = self._create_orm_template()
         image = Image.new('RGBA', (512, 512), (255, 128, 0, 200))
 
         channels = unpack_texture(image, template)
 
-        # Should only extract R, G, B (no alpha)
+        # Should extract R, G, B from template AND auto-extract alpha
+        assert len(channels) == 4
+        assert 'alpha' in channels
+        assert channels['ambient_occlusion'][0, 0] == 255
+        assert channels['alpha'][0, 0] == 200
+
+    def test_unpack_auto_extracts_alpha_from_rgba_image(self):
+        """Test that alpha is automatically extracted from RGBA image with RGB template."""
+        template = self._create_orm_template()  # Only defines R, G, B
+        image = Image.new('RGBA', (512, 512), (255, 128, 64, 200))
+
+        channels = unpack_texture(image, template)
+
+        assert len(channels) == 4
+        assert 'ambient_occlusion' in channels
+        assert 'roughness' in channels
+        assert 'metallic' in channels
+        assert 'alpha' in channels
+        assert channels['alpha'][0, 0] == 200
+
+    def test_unpack_rgb_image_no_alpha_extraction(self):
+        """Test that RGB image doesn't create an alpha channel."""
+        template = self._create_orm_template()
+        image = Image.new('RGB', (512, 512), (255, 128, 64))
+
+        channels = unpack_texture(image, template)
+
         assert len(channels) == 3
         assert 'alpha' not in channels
-        assert channels['ambient_occlusion'][0, 0] == 255
+
+    def test_unpack_rgba_template_no_double_extraction(self):
+        """Test that RGBA template doesn't double-extract alpha."""
+        template = PackingTemplate(
+            'ORMA', 'ORM with Alpha',
+            {
+                'R': ChannelMap('ambient_occlusion', 1.0),
+                'G': ChannelMap('roughness', 0.5),
+                'B': ChannelMap('metallic', 0.0),
+                'A': ChannelMap('opacity', 1.0)
+            }
+        )
+        image = Image.new('RGBA', (512, 512), (255, 128, 64, 200))
+
+        channels = unpack_texture(image, template)
+
+        assert len(channels) == 4
+        assert 'opacity' in channels
+        assert 'alpha' not in channels  # Should NOT auto-extract
 
     def test_unpack_preserves_array_shapes(self):
         """Test that unpacked arrays have the correct shape."""

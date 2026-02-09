@@ -143,6 +143,20 @@ def unpack_texture(
         extracted = extract_channel(image, channel_key)
         result[channel_map.map_type] = extracted
 
+    # AUTO-EXTRACT ALPHA: If image is RGBA and template doesn't define alpha,
+    # automatically extract it so users can preview/download
+    if image.mode == "RGBA" and not template.is_channel_used("A"):
+        try:
+            alpha_data = extract_channel(image, "A")
+            result["alpha"] = alpha_data
+            logger.info(
+                "Auto-extracted alpha channel from RGBA image (not in template '%s')",
+                template.name,
+            )
+        except Exception as e:
+            logger.warning("Failed to auto-extract alpha channel: %s", e)
+            # Don't fail the entire operation if alpha extraction fails
+
     logger.info(
         "Unpacked %d channels from %s image using template '%s'",
         len(result),

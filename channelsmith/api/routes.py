@@ -321,6 +321,11 @@ def unpack() -> tuple:
         for channel_pos, channel_map in template.get_used_channels().items():
             position_map[channel_map.map_type] = channel_pos
 
+        # AUTO-EXTRACTED ALPHA: If 'alpha' was extracted but not in template, map it to 'A'
+        if 'alpha' in unpacked and 'alpha' not in position_map:
+            position_map['alpha'] = 'A'
+            logger.info("Auto-extracted alpha channel mapped to position 'A'")
+
         # Convert numpy arrays to PIL images, then to Base64 for response
         # Use channel position as key (Red Channel, Green Channel, etc.)
         channels_base64 = {}

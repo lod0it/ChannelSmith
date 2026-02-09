@@ -145,6 +145,23 @@ You might need to:
 - Or download them all if available
 - Save to your project folder
 
+### Alpha Channel Auto-Extraction
+
+When you upload an **RGBA texture** (image with alpha channel), ChannelSmith automatically extracts the alpha channel even if your selected preset doesn't define it.
+
+**Example Use Case:**
+- You have a BaseColor texture with RGB in the color channels and Roughness in the alpha channel
+- You select the **ORM** preset (which only defines R, G, B)
+- ChannelSmith will extract:
+  - R → Ambient Occlusion (from template)
+  - G → Roughness (from template)
+  - B → Metallic (from template)
+  - A → Alpha (auto-extracted, not in template)
+
+This means you can preview and download the alpha channel even when using RGB-only presets. Perfect for game engines that pack data this way!
+
+**Note:** If you upload an RGB texture (no alpha), only the template-defined channels are extracted (3 channels).
+
 ### Example: Converting Formats
 
 You have an **ORM** packed texture, but need **ORD** instead:
