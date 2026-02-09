@@ -3,11 +3,11 @@
 **Texture Channel Packing/Unpacking Tool for Game Development**
 
 ![Status](https://img.shields.io/badge/status-beta-brightgreen)
-![Version](https://img.shields.io/badge/version-0.2.0-blue)
+![Version](https://img.shields.io/badge/version-0.3.0-blue)
 ![Python](https://img.shields.io/badge/python-3.8+-blue)
 ![Platform](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey)
 ![License](https://img.shields.io/badge/license-proprietary-red)
-![Tests](https://img.shields.io/badge/tests-229%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-358%20passing-brightgreen)
 
 ---
 
