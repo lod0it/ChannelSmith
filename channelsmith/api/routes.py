@@ -14,10 +14,18 @@ from PIL import Image
 
 import numpy as np
 
+from channelsmith import __version__
 from channelsmith.core import pack_texture_from_template, unpack_texture
 from channelsmith.templates.template_loader import load_template
 from channelsmith.api.utils import image_to_base64, base64_to_image, validate_image_file
 from channelsmith.utils.image_utils import from_grayscale
+from channelsmith.utils.version_checker import (
+    fetch_latest_release,
+    compare_versions,
+    extract_release_summary,
+    build_downloads_dict,
+    UpdateCheckError,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +58,91 @@ def health() -> tuple:
     Returns:
         JSON response with status and version
     """
-    return jsonify({"status": "ok", "version": "0.1.0-web"}), 200
+    return jsonify({"status": "ok", "version": __version__}), 200
+
+
+@api_bp.route("/version/check", methods=["GET"])
+def check_version() -> tuple:
+    """
+    Check for updates via GitHub Releases API.
+
+    Fetches the latest release information from GitHub and compares
+    with the current version. Does NOT automatically download updates.
+
+    Returns:
+        (200) JSON with version information:
+            {
+                "current_version": "0.2.0",
+                "latest_version": "0.3.0",
+                "update_available": true,
+                "release_url": "https://github.com/.../releases/tag/v0.3.0",
+                "release_notes_summary": "Added texture filtering...",
+                "downloads": {
+                    "windows": "https://.../ChannelSmith-Windows.zip",
+                    "macos": "https://.../ChannelSmith-macOS.tar.gz",
+                    "linux": "https://.../ChannelSmith-Linux.tar.gz"
+                },
+                "published_at": "2026-02-09T12:00:00Z"
+            }
+
+        (500) JSON with error information:
+            {
+                "error": "Network timeout...",
+                "current_version": "0.2.0"
+            }
+
+        (503) Rate limit exceeded (rare)
+    """
+    try:
+        release = fetch_latest_release()
+        latest_version = release.get("tag_name", "").lstrip("v")
+
+        # Determine if update is available
+        comparison = compare_versions(__version__, latest_version)
+        update_available = comparison == -1
+
+        # Extract downloads and summary
+        downloads = build_downloads_dict(release.get("assets", []))
+        release_notes = extract_release_summary(release.get("body", ""))
+
+        return (
+            jsonify(
+                {
+                    "current_version": __version__,
+                    "latest_version": latest_version,
+                    "update_available": update_available,
+                    "release_url": release.get("html_url", ""),
+                    "release_notes_summary": release_notes,
+                    "downloads": downloads,
+                    "published_at": release.get("published_at", ""),
+                }
+            ),
+            200,
+        )
+
+    except UpdateCheckError as e:
+        logger.warning("Update check failed: %s", e)
+        return (
+            jsonify(
+                {
+                    "error": str(e),
+                    "current_version": __version__,
+                }
+            ),
+            500,
+        )
+
+    except Exception as e:
+        logger.exception("Unexpected error in version check: %s", e)
+        return (
+            jsonify(
+                {
+                    "error": "An unexpected error occurred. Please try again later.",
+                    "current_version": __version__,
+                }
+            ),
+            500,
+        )
 
 
 @api_bp.route("/templates", methods=["GET"])

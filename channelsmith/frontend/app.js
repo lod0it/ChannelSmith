@@ -134,7 +134,19 @@ const API = {
      */
     async health() {
         const response = await fetch(`${this.baseURL}/health`);
-        return response.ok;
+        return await response.json();
+    },
+
+    /**
+     * Check for updates from GitHub releases.
+     */
+    async checkVersion() {
+        const response = await fetch(`${this.baseURL}/version/check`);
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Version check failed');
+        }
+        return await response.json();
     },
 };
 
@@ -334,6 +346,71 @@ async function loadDocumentation() {
                 <p class="text-sm text-gray-500 mt-2">${error.message}</p>
             </div>
         `;
+    }
+}
+
+/**
+ * Handle "Check for Updates" button click.
+ */
+async function handleCheckUpdates() {
+    const button = document.getElementById('check-updates-btn');
+    const buttonText = document.getElementById('check-updates-text');
+    const resultContainer = document.getElementById('update-result');
+    const statusCurrent = document.getElementById('update-status-current');
+    const statusAvailable = document.getElementById('update-status-available');
+    const statusError = document.getElementById('update-status-error');
+
+    // Show loading state
+    button.disabled = true;
+    buttonText.textContent = 'Checking...';
+
+    // Hide previous results
+    resultContainer.classList.add('hidden');
+    statusCurrent.classList.add('hidden');
+    statusAvailable.classList.add('hidden');
+    statusError.classList.add('hidden');
+
+    try {
+        const result = await API.checkVersion();
+        resultContainer.classList.remove('hidden');
+
+        if (result.update_available) {
+            // Show update available UI
+            statusAvailable.classList.remove('hidden');
+            document.getElementById('latest-version').textContent = `v${result.latest_version}`;
+            document.getElementById('release-notes-summary').textContent =
+                result.release_notes_summary || 'No release notes available.';
+
+            // Set download links
+            if (result.downloads.windows) {
+                const link = document.getElementById('download-windows');
+                link.href = result.downloads.windows;
+                link.classList.remove('hidden');
+            }
+            if (result.downloads.macos) {
+                const link = document.getElementById('download-macos');
+                link.href = result.downloads.macos;
+                link.classList.remove('hidden');
+            }
+            if (result.downloads.linux) {
+                const link = document.getElementById('download-linux');
+                link.href = result.downloads.linux;
+                link.classList.remove('hidden');
+            }
+
+            document.getElementById('view-release').href = result.release_url;
+        } else {
+            // Show up to date UI
+            statusCurrent.classList.remove('hidden');
+        }
+    } catch (error) {
+        console.error('Update check failed:', error);
+        resultContainer.classList.remove('hidden');
+        statusError.classList.remove('hidden');
+        document.getElementById('update-error-message').textContent = error.message;
+    } finally {
+        button.disabled = false;
+        buttonText.textContent = 'Check for Updates';
     }
 }
 
@@ -938,14 +1015,23 @@ function initApp() {
         console.error('Failed to load templates:', error);
     });
 
-    // Health check
-    API.health().then(ok => {
-        if (!ok) {
-            showError('Backend connection failed');
+    // Health check and version display
+    API.health().then(data => {
+        const versionEl = document.getElementById('current-version');
+        if (versionEl && data.version) {
+            versionEl.textContent = `v${data.version}`;
         }
     }).catch(error => {
         console.error('Health check failed:', error);
+        const versionEl = document.getElementById('current-version');
+        if (versionEl) versionEl.textContent = 'Unknown';
     });
+
+    // Setup update check button click handler
+    const checkUpdatesBtn = document.getElementById('check-updates-btn');
+    if (checkUpdatesBtn) {
+        checkUpdatesBtn.addEventListener('click', handleCheckUpdates);
+    }
 }
 
 // Initialize when DOM is ready

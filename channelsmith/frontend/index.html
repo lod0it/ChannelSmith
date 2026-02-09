@@ -233,6 +233,67 @@
                     <div class="flex justify-end mb-4 px-6">
                         <button id="info-close-btn" class="text-gray-400 hover:text-[#ff6b35] transition-colors text-2xl" title="Close documentation">✕</button>
                     </div>
+                    <!-- Version & Updates Section (NEW) -->
+                    <div id="version-section" class="bg-[#151515] border border-[#2a2a2a] rounded-lg p-6 mb-6 mx-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-[#ff6b35] mb-1">Version & Updates</h3>
+                                <p class="text-gray-400 text-sm">Current: <span id="current-version" class="text-white font-mono">Loading...</span></p>
+                            </div>
+                            <button id="check-updates-btn" class="pill-button-secondary">
+                                <span id="check-updates-text">Check for Updates</span>
+                            </button>
+                        </div>
+
+                        <!-- Update Check Result (hidden by default) -->
+                        <div id="update-result" class="hidden mt-4 pt-4 border-t border-[#2a2a2a]">
+                            <!-- Up to date message -->
+                            <div id="update-status-current" class="hidden">
+                                <div class="flex items-center gap-2 text-green-400 mb-2">
+                                    <span class="text-2xl">✓</span>
+                                    <span class="font-bold">You're up to date!</span>
+                                </div>
+                                <p class="text-gray-400 text-sm">You're running the latest version.</p>
+                            </div>
+
+                            <!-- Update available message -->
+                            <div id="update-status-available" class="hidden">
+                                <div class="flex items-center gap-2 text-[#ff8c42] mb-2">
+                                    <span class="text-2xl">↑</span>
+                                    <span class="font-bold">Update Available: <span id="latest-version"></span></span>
+                                </div>
+                                <p id="release-notes-summary" class="text-gray-300 text-sm mb-4"></p>
+
+                                <!-- Download Links -->
+                                <div class="space-y-2">
+                                    <p class="text-gray-400 text-xs font-medium uppercase">Download:</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        <a id="download-windows" href="#" target="_blank" class="download-link hidden">
+                                            🪟 Windows
+                                        </a>
+                                        <a id="download-macos" href="#" target="_blank" class="download-link hidden">
+                                            🍎 macOS
+                                        </a>
+                                        <a id="download-linux" href="#" target="_blank" class="download-link hidden">
+                                            🐧 Linux
+                                        </a>
+                                    </div>
+                                    <a id="view-release" href="#" target="_blank" class="text-[#ff8c42] hover:text-[#ffa65a] text-sm underline block mt-2">
+                                        View full release notes →
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Error message -->
+                            <div id="update-status-error" class="hidden">
+                                <div class="flex items-center gap-2 text-red-400 mb-2">
+                                    <span class="text-2xl">⚠️</span>
+                                    <span class="font-bold">Check Failed</span>
+                                </div>
+                                <p id="update-error-message" class="text-gray-400 text-sm"></p>
+                            </div>
+                        </div>
+                    </div>
                     <!-- Scrollable Documentation Container (Full Width) -->
                     <div id="info-content" class="bg-[#151515] rounded-lg border border-[#2a2a2a] p-8 max-h-[70vh] overflow-y-auto mx-6">
                         <p class="text-gray-400 text-center py-8">Loading documentation...</p>

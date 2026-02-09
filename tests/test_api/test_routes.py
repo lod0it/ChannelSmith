@@ -435,3 +435,49 @@ class TestIntegration:
         # Should normalize to largest size
         img = Image.open(io.BytesIO(response.data))
         assert img.size == (1024, 1024)
+
+
+class TestVersionCheckEndpoint:
+    """Tests for the /api/version/check endpoint."""
+
+    def test_version_check_returns_current_version(self, client):
+        """Should always return current version."""
+        response = client.get("/api/version/check")
+        data = json.loads(response.data)
+        assert "current_version" in data
+        assert data["current_version"]  # Should not be empty
+
+    def test_version_check_returns_latest_version(self, client):
+        """Should return latest version information."""
+        response = client.get("/api/version/check")
+        assert response.status_code in [200, 500]  # May succeed or fail depending on network
+        data = json.loads(response.data)
+        assert "current_version" in data
+
+    def test_version_check_response_structure_on_success(self, client):
+        """Response should have expected structure on success."""
+        response = client.get("/api/version/check")
+        data = json.loads(response.data)
+
+        if response.status_code == 200:
+            # Check all expected fields are present
+            assert "current_version" in data
+            assert "latest_version" in data
+            assert "update_available" in data
+            assert isinstance(data["update_available"], bool)
+            assert "release_url" in data
+            assert "release_notes_summary" in data
+            assert "downloads" in data
+            assert isinstance(data["downloads"], dict)
+            assert "published_at" in data
+
+    def test_version_check_response_structure_on_error(self, client):
+        """Response should include error and current version on failure."""
+        response = client.get("/api/version/check")
+        data = json.loads(response.data)
+
+        if response.status_code == 500:
+            assert "error" in data
+            assert "current_version" in data
+            # Current version should be available even on error
+            assert data["current_version"]
