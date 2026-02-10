@@ -110,7 +110,6 @@ The browser opens automatically at **http://localhost:5000**
 - 🖱️ **Drag-and-Drop** - Upload images by dragging to zones
 - 👁️ **Live Preview** - See channels in real-time as you upload
 - 📥 **Download Results** - Get packed or unpacked images instantly
-- ⚡ **Responsive Design** - Works on desktop, tablet, mobile
 - 🚀 **No External Tools** - Everything in your browser
 
 #### Web UI Workflow
@@ -212,7 +211,6 @@ ChannelSmith/
 │   └── ...
 ├── docs/                      # Documentation
 ├── WEB_UI_TESTING.md          # Web UI testing guide (NEW)
-├── CLAUDE.md                  # Development guidelines
 ├── SETUP.md                   # Installation guide
 ├── requirements.txt           # Python dependencies
 └── README.md                  # This file
